@@ -9,5 +9,5 @@ type in: `./install`.
 # embed it!
 You can embed it into your applications, simply add `service.h` and `service.c` to your project
 and use this function: ` int serve(int http_port, int max_connections, char *serve_directory);`.  
-`max_connections` is the maximum number of clients that can be connected at once. `serve_directory` is
-the folder with the ressources and files that are hosted.
+`max_connections` is the maximum number of clients that can be connected at once.  
+`serve_directory` is the folder with the ressources and files that are hosted.
