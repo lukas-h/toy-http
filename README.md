@@ -1,8 +1,7 @@
 # toy-http
 lightweight embeddable http service.    
 Supported requests: GET, HEAD  
-You can easily embed the http server as a thread to your applications
-It is only designed for unix (linux, macOSX, freebsd and other OS with posix programming environment).
+designed for unix (linux, macOSX, freebsd and other OS with posix programming environment)
 
 # install the standalone server
 You can use it as lightweight server. Only clone this repository and
