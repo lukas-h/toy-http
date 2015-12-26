@@ -24,4 +24,4 @@ and use this function: ` int serve(int http_port, int max_connections, char *ser
 It depends only on the std. library of C, a good C compiler and the posix programming interface.
 
 # licensing
-All distributed under GNU AGPL v3 (or later) Copyright 2015 Lukas Himsel
+All distributed under GNU AGPL v3 (or later); Copyright (C) 2015 Lukas Himsel
