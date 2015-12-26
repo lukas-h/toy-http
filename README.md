@@ -12,6 +12,7 @@ For more advanced usage you need 3 arguments in the console:
 1. Port (numeric)  
 2. Max. Connections at once (numeric)  
 3. Source directory (path)  
+example: `toy-http 8080 300 /var/www` 
 
 # embed it!
 You can embed it into your applications, simply add `service.h` and `service.c` to your project
