@@ -1,5 +1,5 @@
 # toy-http
-lightweight embeddable http server.  
+lightweight embeddable http service.    
 Supported requests: GET, HEAD  
 You can easily embed the http server as a thread to your applications
 It is only designed for unix (linux, macOSX, freebsd and other OS with posix programming environment).
