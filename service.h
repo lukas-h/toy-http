@@ -15,11 +15,12 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
  */
 #ifndef TOY_HTTP_SERVICE_H
 #define TOY_HTTP_SERVICE_H
 
-#define MAX_CONNECTIONS  64
+#define MAX_CONNECTIONS  1024
 #define HTTP_PORT        8976
 #define SERVE_DIRECTORY  "."
 #define DEFAULT_FILE     "index.html"

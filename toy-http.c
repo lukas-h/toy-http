@@ -15,6 +15,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +25,15 @@
 
 void help(){
 	puts("\033[1;31mtoy-http\033[0m\n--------\n"
-		"Usage: \033[1;34mtoy-http\033[0m <PORT> <MAX-CONNECTIONS> <SERVE-FOLDER>\nYou can also use it without any arguments, to run in the actual foler and with a max. of 64 connections.");
+		"Usage: \033[1;34mtoy-http\033[0m <PORT> <MAX-CONNECTIONS> <SERVE-FOLDER>\n"
+		"You can also use it without any arguments,\n to run in the actual folder.");
+}
+
+void version(){
+	puts("\033[1;31mtoy-http\033[0m\n--------\n"
+		"Version: 0.0\nCopyright (C) 2015 Lukas Himsel\nlicensed under GNU GPL v3\n"
+	    "This program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\n"
+	    "under certain conditions; see `www.gnu.org/licenses/gpl.html\' for details.\n");
 }
 
 int main(int argc, char *argv[]){
@@ -33,8 +42,16 @@ int main(int argc, char *argv[]){
 		return serve(HTTP_PORT, MAX_CONNECTIONS, SERVE_DIRECTORY);
 	}
 	else if(argc==2){
-		if(strcmp(argv[1], "--help")==0 || strcmp(argv[1], "-h")){
+		if(strcmp(argv[1], "--help")==0){
 			help();
+		}
+		else if(strcmp(argv[1], "--version")==0){
+			version();
+		}
+		else{
+			puts("error: incompatible arguments");
+			help();
+			return 1;
 		}
 		return 0;
 	}
