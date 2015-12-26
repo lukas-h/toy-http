@@ -31,7 +31,7 @@ void help(){
 
 void version(){
 	puts("\033[1;31mtoy-http\033[0m\n--------\n"
-		"Version: 0.0\nCopyright (C) 2015 Lukas Himsel\nlicensed under GNU GPL v3\n"
+		"Version: 0.0\nCopyright (C) 2015 Lukas Himsel\nlicensed under GNU AGPL v3\n"
 	    "This program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\n"
 	    "under certain conditions; see `www.gnu.org/licenses/gpl.html\' for details.\n");
 }
