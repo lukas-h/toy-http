@@ -39,14 +39,19 @@ static int isjavascript(char *filename);
 static int http_service(int client);
 
 int serve(int http_port, int max_connections, char *serve_directory){
-	int fd, client, pid;
+	int fd, client, pid, err_cnt;
 	struct sockaddr_in addr, client_addr;
 	socklen_t siz;
+	
+	if(http_port >  65535){
+		fprintf(stderr, "error: illegal port");
+		return PORT_ERR;
+	}
 	
 	fd = socket(PF_INET, SOCK_STREAM, 0);
 	if(fd == -1){
 		fprintf(stderr, "error: can not create new socket\n");
-		return 1;
+		return SOCKET_ERR;
 	}
 	
 	addr.sin_family = AF_INET;
@@ -55,17 +60,17 @@ int serve(int http_port, int max_connections, char *serve_directory){
 	
 	if(bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in))==-1){
 		fprintf(stderr, "error: bind() failed.\n\033[1;31mIs another server running on this port?\033[0m\n");
-		return 1;
+		return BIND_ERR;
 	}
 	
 	if(listen(fd, max_connections)==-1){
 		fprintf(stderr, "error: listen() failed\n");
-		return 1;
+		return LISTEN_ERR;
 	}
 	
 	if(chdir(serve_directory)){
 		fprintf(stderr, "error: invalid path or can not set");
-		return 1;
+		return PATH_ERR;
 	}
 	
 	while(1){
@@ -73,12 +78,24 @@ int serve(int http_port, int max_connections, char *serve_directory){
 		client = accept(fd, (struct sockaddr *)&client_addr, &siz);
 		if(client==-1){
 			fprintf(stderr,"error: accept() failed");
+			err_cnt++;
+			if(err_cnt > 2){
+				return ACCEPT_ERR;
+			}
 			continue;
+		} else{
+			err_cnt=0;
 		}
 		
 		pid = fork();
 		if(pid==-1){
-			fprintf(stderr, "fork() failed");
+			fprintf(stderr, "error: fork() failed");
+			err_cnt++;
+			if(err_cnt > 2){
+				close(client);
+				return FORK_ERR;
+			}
+			continue;
 		}
 		if(pid==0){
 			close(fd);
@@ -151,6 +168,7 @@ static int http_service(int client){
 	while(recv_line(client, buf, 256) > 0);
 	
 	if( (strcmp(request, "GET")!=0) && (strcmp(request, "HEAD")!=0)){
+		fprintf(stderr, "warning: request `%s` not supported\n", request);
 		return 0;
 	}
 	
