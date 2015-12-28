@@ -5,7 +5,7 @@ designed for unix (linux, macOSX, freebsd and other OS with posix programming en
 
 # install the standalone server
 You can use it as lightweight server. Only clone this repository and
-type in: `./install`.  
+type in: `./install` or if you prefer make, type `make && sudo make install`
 Try `toy-http` to run the server in the actual directory.  
 For more advanced usage you need 3 arguments in the console:  
 1. Port (numeric)  
