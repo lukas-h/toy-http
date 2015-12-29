@@ -1,3 +1,4 @@
+branch `static` contains the first version, without implemented POST and allows only static hosting
 # toy-http
 lightweight embeddable http service.    
 Supported requests: GET, HEAD  
