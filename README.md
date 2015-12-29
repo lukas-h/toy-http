@@ -2,7 +2,10 @@
 lightweight embeddable http service.    
 Supported requests: GET, HEAD  
 designed for unix (linux, macOSX, freebsd and other OS with posix programming environment)
-
+# branches
+The *static* branch contains the first version, that only offers static hosting (GET, HEAD).  
+*master* contatins the actual development state.  
+*testing* is buggy, testing of new features, etc.
 # install the standalone server
 You can use it as lightweight server. Only clone this repository and
 type in: `./install` or if you prefer make, type `make && sudo make install`.  
