@@ -1,3 +1,4 @@
+![](favicon.png)
 # toy-http
 lightweight embeddable http service.    
 Supported requests: GET, HEAD  

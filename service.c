@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
+#include <signal.h> /* for SIGINT */
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -38,10 +38,62 @@ static int iscss(char *filename);
 static int isjavascript(char *filename);
 static int http_service(int client);
 
+
+#define SET_FD 1
+#define CLOSE_FD 2
+static void getter_fd(int fd, int client, int instr){
+	static int f1, f2;
+	
+	if(instr==SET_FD){
+		if(fd){
+			f1=fd;
+		}
+		if(client){
+			f2=client;
+		}
+	}
+	if(instr==CLOSE_FD){
+		close(f1);
+		shutdown(f2, SHUT_RDWR);
+		close(f2);
+	}
+}
+
+static void abort_program(int signum){
+	getter_fd(0, 0, CLOSE_FD);
+	
+	switch(signum){
+		case SIGABRT:
+			fprintf(stderr, "abnormal termination: exit\n");
+			exit(1);
+		break;
+		case SIGILL:
+			fprintf(stderr, "invalid instruction: please contact the maintainer\n");
+			exit(1);
+		break;
+		case SIGINT:
+			exit(0);
+		break;
+		case SIGSEGV:
+			fprintf(stderr, "invalid memory access: please contact the maintainer\n");
+			exit(1);
+		break;
+		case SIGTERM:
+			fprintf(stderr, "termination request: exit\n");
+		break;
+		default:
+			exit(1);
+		break;
+	}
+	exit(1); // sicherheitshalber
+}
+
 int serve(int http_port, int max_connections, char *serve_directory){
 	int fd, client, pid;
 	struct sockaddr_in addr, client_addr;
 	socklen_t siz;
+	
+	signal(SIGINT, abort_program); //signal handling
 	
 	fd = socket(PF_INET, SOCK_STREAM, 0);
 	if(fd == -1){
@@ -64,33 +116,39 @@ int serve(int http_port, int max_connections, char *serve_directory){
 	}
 	
 	if(chdir(serve_directory)){
-		fprintf(stderr, "error: invalid path or can not set");
+		fprintf(stderr, "error: invalid path or can not set\n");
 		return 1;
 	}
 	
 	while(1){
+		
 		siz = sizeof(struct sockaddr_in);
 		client = accept(fd, (struct sockaddr *)&client_addr, &siz);
+		
+		getter_fd(fd, client, SET_FD); //signal handling
+		
 		if(client==-1){
-			fprintf(stderr,"error: accept() failed");
+			fprintf(stderr,"error: accept() failed\n");
 			continue;
 		}
 		
 		pid = fork();
 		if(pid==-1){
-			fprintf(stderr, "fork() failed");
+			fprintf(stderr, "fork() failed\n");
 		}
 		if(pid==0){
 			close(fd);
-			if(http_service(client)){
-				fprintf(stderr, "warning: trouble with client\n");
-			}
+			
+			http_service(client);
+			
 			shutdown(client, SHUT_RDWR);
 			close(client);
 			return 0;
 		}
 		close(client);
 	}
+	
+	close(fd);
 	return 0;
 }
 
@@ -142,15 +200,18 @@ static int http_service(int client){
 	FILE *f;
 	
 	if(recv_line(client, buf, 256)==0){
+		fprintf(stderr, "warning: can not receive request\n");
 		return 1;
 	}
 	if(sscanf(buf, "%7s %127s", request, url) < 2){
+		fprintf(stderr, "warning: parsing error %s\n", buf);
 		return 1;
 	}
 	
 	while(recv_line(client, buf, 256) > 0);
 	
 	if( (strcmp(request, "GET")!=0) && (strcmp(request, "HEAD")!=0)){
+		fprintf(stderr,"warning: request method `%s` not supported\n", request);
 		return 0;
 	}
 	
@@ -173,10 +234,10 @@ static int http_service(int client){
 		send(client, "Content-type: text/html\r\n", 25, 0);
 	}
 	else if(iscss(filename)){
-		send(client, "Content-type: text/javascript\r\n", 31, 0);
+		send(client, "Content-type: text/css\r\n", 31, 0);
 	}
 	else if(isjavascript(filename)){
-		send(client, "Content-type: text/css\r\n", 24, 0);
+		send(client, "Content-type: text/javascript\r\n", 24, 0);
 	}
 	
 	sprintf(buf, "Content-length: %ld\r\n\r\n", sizeof_file(filename));
