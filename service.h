@@ -25,6 +25,16 @@
 #define SERVE_DIRECTORY  "."
 #define DEFAULT_FILE     "index.html"
 
+// #define NO_ERROR_MESSAGES
+
+#define PORT_ERR   1
+#define BIND_ERR   2
+#define SOCKET_ERR 3
+#define LISTEN_ERR 4
+#define PATH_ERR   5
+#define ACCEPT_ERR 6
+#define FORK_ERR   7
+
 extern int serve(int http_port, int max_connections, char *serve_directory);
 
 #endif

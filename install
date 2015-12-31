@@ -7,6 +7,11 @@ cc -o toy-http toy-http.o service.o
 rm service.o
 rm toy-http.o
 
+printf "Do you want to move \033[1;31mtoy-http\033[0m to your application folder (/usr/local/bin)?"
+read ans
+if [ $ans = y -o $ans = Y -o $ans = yes -o $ans = Yes -o $ans = YES ]
+then
 sudo cp toy-http /usr/local/bin/
-rm toy-http
+fi
+
 echo "toy-http installed ..."
