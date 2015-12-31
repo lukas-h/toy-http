@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h> /* for SIGINT */
+#include <signal.h>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -232,8 +232,10 @@ static int http_service(int client){
 	while(recv_line(client, buf, 256) > 0);
 	
 	if( (strcmp(request, "GET")!=0) && (strcmp(request, "HEAD")!=0)){
+		
 		send(client, "HTTP/1.0 501 Not Implemented\r\nContent-Type: text/html\r\nContent-length: 104\r\n\r\n"
 			"<html><head><title>Error</title></head><body><hr><h1>HTTP method not implemented.</h1><hr></body></html>", 162, 0);
+		
 		fprintf(stderr, "warning: request method `%s` not supported\n", request);
 		return 0;
 	}
