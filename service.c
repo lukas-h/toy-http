@@ -180,7 +180,25 @@ int serve(int http_port, int max_connections, char *serve_directory){
 
 static long file_attributes(char *filename){
 	struct stat info;
+
+	if(strncmp(filename, "../", 3)==0 || *filename=='/'){
+		return FILE_NO_PERM;
+	}
+
 	if(stat(filename, &info)==-1){
+		return NOT_EXISTING;
+	}
+	
+	if(!(info.st_mode & S_IRUSR)){
+		return FILE_NO_PERM;
+	}
+
+
+	if(S_ISDIR(info.st_mode)){
+		return FILE_IS_DIR;
+	}
+
+	if(!info.st_size){
 		return 0;
 	}
 	
@@ -263,8 +281,7 @@ static int http_service(int client){
 		return 0;
 	}
 	else if(file_size==FILE_IS_DIR){
-		sprintf(url, "%s/%s", url, DEFAULT_FILE);
-		filename = &(url[1]);
+		strcat(filename, "/index.html");
 	}
 	else if(file_size==FILE_NO_PERM){
 		send(client, "HTTP/1.0 403 Forbidden\r\nContent-Type: text/html\r\nContent-length: 91\r\n\r\n"
