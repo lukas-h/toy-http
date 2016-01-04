@@ -31,7 +31,7 @@
 
 #include "service.h"
 
-static unsigned long sizeof_file(char *filename);
+static long file_attributes(char *filename);
 static int recv_line(int fd, char *buf, int len);
 static int ishtml(char *filename);
 static int iscss(char *filename);
@@ -173,11 +173,17 @@ int serve(int http_port, int max_connections, char *serve_directory){
 	return 0;
 }
 
-static unsigned long sizeof_file(char *filename){
+
+#define NOT_EXISTING  0
+#define FILE_IS_DIR  -1
+#define FILE_NO_PERM -2
+
+static long file_attributes(char *filename){
 	struct stat info;
 	if(stat(filename, &info)==-1){
 		return 0;
 	}
+	
 	return info.st_size;
 }
 
@@ -218,6 +224,7 @@ static int http_service(int client){
 	char buf[256], request[8], url[128];
 	char *filename;
 	int len;
+	long file_size;
 	FILE *f;
 	
 	if(recv_line(client, buf, 256)==0){
@@ -239,10 +246,30 @@ static int http_service(int client){
 		fprintf(stderr, "warning: request method `%s` not supported\n", request);
 		return 0;
 	}
+
+	if(url[strlen(url)-1]=='/'){
+		url[strlen(url)-1]='\0';
+	}
 	
 	filename = &(url[1]);
 	if(!strlen(filename)){
 		filename = DEFAULT_FILE;
+	}
+
+	file_size = file_attributes(filename);
+	if(file_size==NOT_EXISTING){
+		send(client, "HTTP/1.0 404 Not Found\r\nContent-Type: text/html\r\nContent-length: 91\r\n\r\n"
+			"<html><head><title>Error</title></head><body><hr><h1>File not found.</h1><hr></body></html>", 162, 0);
+		return 0;
+	}
+	else if(file_size==FILE_IS_DIR){
+		sprintf(url, "%s/%s", url, DEFAULT_FILE);
+		filename = &(url[1]);
+	}
+	else if(file_size==FILE_NO_PERM){
+		send(client, "HTTP/1.0 403 Forbidden\r\nContent-Type: text/html\r\nContent-length: 91\r\n\r\n"
+			"<html><head><title>Error</title></head><body><hr><h1>No permission.</h1><hr></body></html>", 162, 0);
+		return 0;
 	}
 	
 	f = fopen(filename, "r");
@@ -265,7 +292,7 @@ static int http_service(int client){
 		send(client, "Content-type: text/javascript\r\n", 24, 0);
 	}
 	
-	sprintf(buf, "Content-length: %ld\r\n\r\n", sizeof_file(filename));
+	sprintf(buf, "Content-length: %ld\r\n\r\n", file_size);
 	send(client, buf, strlen(buf), 0);
 	
 	/* if not only HEAD */
