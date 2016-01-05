@@ -25,8 +25,6 @@
 #define SERVE_DIRECTORY  "."
 #define DEFAULT_FILE     "index.html"
 
-// #define NO_ERROR_MESSAGES
-
 #define PORT_ERR   1
 #define BIND_ERR   2
 #define SOCKET_ERR 3
