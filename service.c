@@ -1,7 +1,7 @@
 /*
  * service.c
  *
- * Copyright 2015 Lukas Himsel <lukas.himsel@web.de>
+ * Copyright 2015, 2016 Lukas Himsel <lukas.himsel@web.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -103,6 +103,9 @@ int serve(int http_port, int max_connections, char *serve_directory){
 		fprintf(stderr, "error: illegal port\n");
 		return PORT_ERR;
 	}
+
+	// status message
+	printf("\033[1;31mtoy-http\033[0m\n--------\nHost: http://127.0.0.1:%d\n\nCtrl-C to abort.\n", http_port);
 	
 	fd = socket(PF_INET, SOCK_STREAM, 0);
 	if(fd == -1){
@@ -181,7 +184,7 @@ int serve(int http_port, int max_connections, char *serve_directory){
 static long file_attributes(char *filename){
 	struct stat info;
 
-	if(strncmp(filename, "../", 3)==0 || *filename=='/'){
+	if(strncmp(filename, "..", 2)==0 || filename[0]=='/'){
 		return FILE_NO_PERM;
 	}
 

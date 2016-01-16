@@ -40,11 +40,10 @@ void version(){
 int is_numeric(char *str);
 int is_path(char *str);
 
-//#define DEBUG
-#ifndef DEBUG
 int main(int argc, char *argv[]){
 	int err=0;
 
+	/*
 	if(argc==1){
 		err=serve(HTTP_PORT, MAX_CONNECTIONS, SERVE_DIRECTORY);
 	}
@@ -56,12 +55,10 @@ int main(int argc, char *argv[]){
 			version();
 		}
 		else if(is_numeric(argv[1])){
-			puts("port");
-			return serve(atoi(argv[1]), MAX_CONNECTIONS, SERVE_DIRECTORY);
+			err=serve(atoi(argv[1]), MAX_CONNECTIONS, SERVE_DIRECTORY);
 		}
 		else if(is_path(argv[1])){
-			puts("path");
-			return serve(HTTP_PORT, MAX_CONNECTIONS, argv[1]);
+			err=serve(HTTP_PORT, MAX_CONNECTIONS, argv[1]);
 		}
 		else{
 			puts("error: incompatible arguments");
@@ -76,51 +73,76 @@ int main(int argc, char *argv[]){
 	}
 	else if(argc==4){
 		if(is_numeric(argv[1]) && is_path(argv[2]) && is_numeric(argv[1])){
-			err=serve(atoi(argv[1]), atoi(argv[3]), argv[2]);
+			err=serve(atoi(argv[1]), atoi(argv[2]), argv[3]);
 		}
 	}
 	else{
 		puts("error: incompatible arguments");
 		help();
 		err=1;
-	}
+	}*/
 
+	switch(argc){
+
+		case 1:
+			err=serve(HTTP_PORT, MAX_CONNECTIONS, SERVE_DIRECTORY);
+		break;
+
+		case 2:
+			if(strcmp(argv[1], "--help")==0){
+				help();
+			}
+			else if(strcmp(argv[1], "--version")==0){
+				version();
+			}
+			else if(is_numeric(argv[1])){
+				err=serve(atoi(argv[1]), MAX_CONNECTIONS, SERVE_DIRECTORY);
+			}
+			else if(is_path(argv[1])){
+				err=serve(HTTP_PORT, MAX_CONNECTIONS, argv[1]);
+			}
+			else{
+				puts("error: incompatible arguments");
+				help();
+				err=1;
+			}
+		break;
+
+		case 3:
+			if(is_numeric(argv[1]) && is_path(argv[2])){
+				err=serve(atoi(argv[1]), MAX_CONNECTIONS, argv[2]);
+			}
+		break;
+
+		case 4:
+			if(is_numeric(argv[1]) && is_path(argv[2]) && is_numeric(argv[1])){
+				err=serve(atoi(argv[1]), atoi(argv[2]), argv[3]);
+			}
+		break;
+		
+		default:
+			puts("error: incompatible arguments");
+			help();
+			err=1;
+		break;
+	}
 	return err;
 }
-#else
-int main(){
-	char str[34] = "456";
-	if(is_numeric(str)){
-		puts("numeric");
-	}
-	else if(is_path(str)){
-		puts("path");
-	}
-	else{
-		puts("nothing");
-	}
-	return 0;
-}
-
-#endif
 
 int is_numeric(char *str){
-	do{
-		if( !(*str>='0' && *str<='9')){
+	while(*str++){
+		if(!isdigit(*str))
 			return 0;
-		}
-		str++;
-	} while(*str);
+	}
 	return 1;
 }
 
 int is_path(char *str){
-	int val=0;
+	int val;
 	do{
 		if(isalpha(*str)){ val++; }
 		if(*str=='/'){ val++; }
-		if(*str=='.'){ val++; }
-		str++;
-	} while(*str);
-	return (val) ? 1 : 0;
+		if(*str=='.'){ val+=2; }
+	} while(*str++);
+	return (val > 2) ? 1 : 0;
 }
