@@ -7,11 +7,11 @@ designed for unix (linux, macOSX, freebsd and other OS with posix programming en
 You can use it as lightweight server. Only clone this repository and
 type in: `./install` or if you prefer make, type `make && sudo make install`.
 Try `toy-http` to run the server in the actual directory.
-For more advanced usage you need 3 arguments in the console:
+For more advanced usage you can set three arguments:
 1. Port (numeric)
 2. Max. Connections at once (numeric)
 3. Source directory (path)
-example: `toy-http 8080 300 /var/www`
+example: `toy-http 8080 /var/www 30`
 
 ## features
 - support for GET and HEAD requests
