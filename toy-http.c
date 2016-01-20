@@ -24,85 +24,53 @@
 
 #include "service.h"
 
-void help(){
-	puts("\033[1;31mtoy-http\033[0m\n--------\n"
-		"Usage: \033[1;34mtoy-http\033[0m <PORT> <SERVE-FOLDER> <MAX-CONNECTIONS>\n"
-		"You can also use it without any arguments,\n to run in the actual folder.");
-}
-
-void version(){
-	puts("\033[1;31mtoy-http\033[0m\n--------\n"
-		"Version: 0.0\nCopyright (C) 2015 Lukas Himsel\nlicensed under GNU AGPL v3\n"
-	    "This program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\n"
-	    "under certain conditions; see `www.gnu.org/licenses/gpl.html\' for details.\n");
-}
-
 int is_numeric(char *str);
 int is_path(char *str);
+int helppages(char *str);
+void help(void);
 
-//#define DEBUG
-#ifndef DEBUG
 int main(int argc, char *argv[]){
 	int err=0;
 
-	if(argc==1){
-		err=serve(HTTP_PORT, MAX_CONNECTIONS, SERVE_DIRECTORY);
-	}
-	else if(argc==2){
-		if(strcmp(argv[1], "--help")==0){
-			help();
-		}
-		else if(strcmp(argv[1], "--version")==0){
-			version();
-		}
-		else if(is_numeric(argv[1])){
-			puts("port");
-			return serve(atoi(argv[1]), MAX_CONNECTIONS, SERVE_DIRECTORY);
-		}
-		else if(is_path(argv[1])){
-			puts("path");
-			return serve(HTTP_PORT, MAX_CONNECTIONS, argv[1]);
-		}
-		else{
+
+	switch(argc){
+		case 1:
+			err=serve(HTTP_PORT, MAX_CONNECTIONS, SERVE_DIRECTORY);
+		break;
+		case 2:
+			if( !helppages(argv[1])){
+				if(is_numeric(argv[1])){
+					err=serve(atoi(argv[1]), MAX_CONNECTIONS, SERVE_DIRECTORY);
+				}
+				else if(is_path(argv[1])){
+					err=serve(HTTP_PORT, MAX_CONNECTIONS, argv[1]);
+				}
+				else{
+					puts("error: incompatible arguments");
+					help();
+					err=1;
+				}
+			}
+		break;
+		case 3:
+			if(is_numeric(argv[1]) && is_path(argv[2])){
+				err=serve(atoi(argv[1]), MAX_CONNECTIONS, argv[2]);
+			}
+		break;
+		case 4:
+			if(is_numeric(argv[1]) && is_path(argv[2]) && is_numeric(argv[1])){
+				err=serve(atoi(argv[1]), atoi(argv[3]), argv[2]);
+			}
+		break;
+		default:
 			puts("error: incompatible arguments");
 			help();
 			err=1;
-		}
-	}
-	else if(argc==3){
-		if(is_numeric(argv[1]) && is_path(argv[2])){
-			err=serve(atoi(argv[1]), MAX_CONNECTIONS, argv[2]);
-		}
-	}
-	else if(argc==4){
-		if(is_numeric(argv[1]) && is_path(argv[2]) && is_numeric(argv[1])){
-			err=serve(atoi(argv[1]), atoi(argv[3]), argv[2]);
-		}
-	}
-	else{
-		puts("error: incompatible arguments");
-		help();
-		err=1;
+		break;
 	}
 
 	return err;
 }
-#else
-int main(){
-	char str[34] = "456";
-	if(is_numeric(str)){
-		puts("numeric");
-	}
-	else if(is_path(str)){
-		puts("path");
-	}
-	else{
-		puts("nothing");
-	}
-	return 0;
-}
-
-#endif
 
 int is_numeric(char *str){
 	do{
@@ -123,4 +91,27 @@ int is_path(char *str){
 		str++;
 	} while(*str);
 	return (val) ? 1 : 0;
+}
+
+void help(){
+	puts("\033[1;31mtoy-http\033[0m\n--------\n"
+	"Usage: \033[1;34mtoy-http\033[0m <PORT> <SERVE-FOLDER> <MAX-CONNECTIONS>\n"
+	"You can also use it without any arguments,\n to run it in the actual folder.");
+}
+
+int helppages(char *str){
+	if(strcmp(str, "--help")==0 || strcmp(str, "-h")==0){
+		help();
+		return 1;
+	}
+	else if(strcmp(str, "--version")==0 || strcmp(str, "-v")==0){
+		puts("\033[1;31mtoy-http\033[0m\n--------\n"
+		"Version: 0.0\nCopyright (C) 2015 Lukas Himsel\nlicensed under GNU AGPL v3\n"
+	    "This program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\n"
+	    "under certain conditions; see `www.gnu.org/licenses/gpl.html\' for details.\n");
+	    return 1;
+	}
+	else{
+		return 0;
+	}
 }
