@@ -1,6 +1,6 @@
 ![](favicon.png)
 # toy-http
-[![Build Status](https://travis-ci.org/lukas-h/toy-http.svg?branch=master)](https://travis-ci.org/lukas-h/toy-http)
+[![Build Status](https://travis-ci.org/lukas-h/toy-http.svg?branch=master)](https://travis-ci.org/lukas-h/toy-http)  
 lightweight embeddable http service,
 providing static site hosting.  
 designed for unix (linux, macOSX, freebsd and other OS with posix programming environment)
