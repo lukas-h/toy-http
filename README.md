@@ -42,6 +42,6 @@ It depends only on the std. library of C, a good C compiler and the posix progra
 `service.c` and `service.h` <- the library files
 
 ## licensing
-All distributed under GNU LGPL v3 (or later); Copyright (C) 2015 Lukas Himsel  
-In former versions, it was licensed under GNU AGPL v3 (see branch `old`)
-
+This project is licensed under the GNU LGPL v3 or later (the library)  
+and the standalone server under GNU AGPL v3 or later.
+Copyright (C) 2015, 2016 Lukas Himsel
