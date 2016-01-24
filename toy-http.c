@@ -24,6 +24,7 @@
 
 #include "service.h"
 
+int run_server(int port, int max_connections, char *serve_dir);
 int is_numeric(char *str);
 int is_path(char *str);
 int helppages(char *str);
@@ -35,15 +36,15 @@ int main(int argc, char *argv[]){
 
 	switch(argc){
 		case 1:
-			err=serve(HTTP_PORT, MAX_CONNECTIONS, SERVE_DIRECTORY);
+			err=run_server(HTTP_PORT, MAX_CONNECTIONS, SERVE_DIRECTORY);
 		break;
 		case 2:
 			if( !helppages(argv[1])){
 				if(is_numeric(argv[1])){
-					err=serve(atoi(argv[1]), MAX_CONNECTIONS, SERVE_DIRECTORY);
+					err=run_server(atoi(argv[1]), MAX_CONNECTIONS, SERVE_DIRECTORY);
 				}
 				else if(is_path(argv[1])){
-					err=serve(HTTP_PORT, MAX_CONNECTIONS, argv[1]);
+					err=run_server(HTTP_PORT, MAX_CONNECTIONS, argv[1]);
 				}
 				else{
 					puts("error: incompatible arguments");
@@ -54,12 +55,12 @@ int main(int argc, char *argv[]){
 		break;
 		case 3:
 			if(is_numeric(argv[1]) && is_path(argv[2])){
-				err=serve(atoi(argv[1]), MAX_CONNECTIONS, argv[2]);
+				err=run_server(atoi(argv[1]), MAX_CONNECTIONS, argv[2]);
 			}
 		break;
 		case 4:
-			if(is_numeric(argv[1]) && is_path(argv[2]) && is_numeric(argv[1])){
-				err=serve(atoi(argv[1]), atoi(argv[3]), argv[2]);
+			if(is_numeric(argv[1]) && is_path(argv[2]) && is_numeric(argv[3])){
+				err=run_server(atoi(argv[1]), atoi(argv[3]), argv[2]);
 			}
 		break;
 		default:
@@ -70,6 +71,12 @@ int main(int argc, char *argv[]){
 	}
 
 	return err;
+}
+
+int run_server(int port, int max_connections, char *serve_dir){
+	// status message
+	printf("\033[1;31mtoy-http\033[0m\n--------\nHost: http://127.0.0.1:%d\n\nCtrl-C to abort.\n", port);
+	return serve(port, max_connections, serve_dir);
 }
 
 int is_numeric(char *str){

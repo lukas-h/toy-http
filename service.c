@@ -104,9 +104,6 @@ int serve(int http_port, int max_connections, char *serve_directory){
 		return PORT_ERR;
 	}
 
-	// status message
-	printf("\033[1;31mtoy-http\033[0m\n--------\nHost: http://127.0.0.1:%d\n\nCtrl-C to abort.\n", http_port);
-	
 	fd = socket(PF_INET, SOCK_STREAM, 0);
 	if(fd == -1){
 		fprintf(stderr, "error: can not create new socket\n");
