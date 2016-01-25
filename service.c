@@ -33,9 +33,7 @@
 
 static long file_attributes(char *filename);
 static int recv_line(int fd, char *buf, int len);
-static int ishtml(char *filename);
-static int iscss(char *filename);
-static int isjavascript(char *filename);
+static char *get_content_type(char *filename);
 static int http_service(int client);
 
 
@@ -219,28 +217,38 @@ static int recv_line(int fd, char *buf, int len){
 	return i;
 }
 
-static int ishtml(char *filename){
-	if(strcmp( &(filename[strlen(filename)-4]), ".htm")==0 || strcmp( &(filename[strlen(filename)-5]), ".html")==0){
-		return 1;
+struct key_val_t{
+	char *key;
+	char *val;
+} const array[] ={
+	{ ".html", "Content-type: text/html\r\n"},
+	{ ".css", "Content-type: text/css\r\n"},
+	{ ".js", "Content-type: text/javascript\r\n"}
+	/* more will follow soon */
+};
+
+static char *get_content_type(char *filename){
+	unsigned long index, len_name, len_key;
+	len_name = strlen(filename);
+	char *p;
+	for(index=0; index < sizeof(array) / sizeof(struct key_val_t); index++){
+		p = array[index].val;
+		len_key = strlen(array[index].key);
+		
+		if(len_key > len_name){
+			continue;
+		} else{
+			if(strcmp(array[index].key, &(filename[len_name - len_key]))==0){
+				return p;
+			}
+		}
 	}
-	return 0;
-}
-static int iscss(char *filename){
-	if(strcmp( &filename[strlen(filename)-4], ".css")==0){
-		return 1;
-	}
-	return 0;
-}
-static int isjavascript(char *filename){
-	if(strcmp( &filename[strlen(filename)-3], ".js")==0){
-		return 1;
-	}
-	return 0;
+	return NULL;
 }
 
 static int http_service(int client){
 	char buf[256], request[8], url[128];
-	char *filename;
+	char *filename, *content_type;
 	int len;
 	long file_size;
 	FILE *f;
@@ -297,16 +305,11 @@ static int http_service(int client){
 	}
 	
 	send(client, "HTTP/1.0 200 OK\r\n", 17, 0);
-	
+
 	/* add content information */
-	if(ishtml(filename)){
-		send(client, "Content-type: text/html\r\n", 25, 0);
-	}
-	else if(iscss(filename)){
-		send(client, "Content-type: text/css\r\n", 31, 0);
-	}
-	else if(isjavascript(filename)){
-		send(client, "Content-type: text/javascript\r\n", 24, 0);
+	content_type = get_content_type(filename);
+	if(content_type!=NULL){
+		send(client, content_type, strlen(content_type), 0);
 	}
 	
 	sprintf(buf, "Content-length: %ld\r\n\r\n", file_size);
