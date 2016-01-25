@@ -19,7 +19,7 @@ example: `toy-http 8080 /var/www 30`
 - blocking function for parental folders of the serve folder  
 - plainness: less than 400 lines of source code  
 - no dependencies to external libraries, just the C standard libraries and  
- the posix API (preinstalled on all good unix-derivates)  
+ the posix API (preinstalled on all good unix-derivates) and socket api (included)  
   
 I wrote toy-http to test the http protocol and not to make a project
 for serious usage. It is now at the point to be a small alternative to
@@ -46,8 +46,6 @@ and use this function: ` int serve(int http_port, int max_connections, char *ser
 
 hint: for embedding, it could be useful to modificate the signal handlers
 and exit functions.
-## dependencies
-It depends only on the std. library of C, a good C compiler and the posix programming interface.
 
 ## files
 `toy-http.c` <- the main file for the standalone server  
