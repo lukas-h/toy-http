@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/lukas-h/toy-http.svg?branch=master)](https://travis-ci.org/lukas-h/toy-http)  
 lightweight embeddable http service,
 providing static site hosting.  
+Zero dependency alternative to node's `http_server` 
 designed for unix (linux, macOSX, freebsd and other OS with posix programming environment)
 ## install the standalone server
 You can use it as lightweight server. Only clone this repository and  
