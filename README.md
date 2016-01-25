@@ -3,12 +3,8 @@
 [![Build Status](https://travis-ci.org/lukas-h/toy-http.svg?branch=master)](https://travis-ci.org/lukas-h/toy-http)  
 lightweight embeddable http service,
 providing static site hosting.  
-Zero dependency alternative to node's `http_server` 
-designed for unix (linux, macOSX, freebsd and other OS with posix programming environment)
-## install the standalone server
-You can use it as lightweight server. Only clone this repository and  
-type in: `./install` or if you prefer make, type `make && sudo make install`.  
-Try `toy-http` to run the server in the actual directory.  
+Zero dependency alternative to node's `http_server`  
+designed for unix-like platforms
 For more advanced usage you can set three arguments:  
 1. Port (numeric)  
 2. Max. Connections at once (numeric)  
@@ -24,6 +20,23 @@ example: `toy-http 8080 /var/www 30`
 - plainness: less than 400 lines of source code  
 - no dependencies to external libraries, just the C standard libraries and  
  the posix API (preinstalled on all good unix-derivates)  
+  
+I wrote toy-http to test the http protocol and not to make a project
+for serious usage. It is now at the point to be a small alternative to
+other servers for static hosting like the `http_server` of the nodejs project.
+The server is ideal for hosting the current folder to test websites, aso.
+
+## platforms
+Because of the dependencies to the BSD-Socket API and the Posix programming interface,
+toy-http is only available for unix platforms like:
+- linux  
+- FreeBSD, NetBSD, OpenBSD and other BSD derivates  
+- GNU Hurd  
+- MacOSx  
+- Solaris (maybe)  
+- and more  
+  
+Windows is supported with CygWin (or something similar)
 
 ## embed it!
 You can embed it into your applications, simply add `service.h` and `service.c` to your project  
