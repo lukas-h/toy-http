@@ -221,9 +221,10 @@ struct key_val_t{
 	char *key;
 	char *val;
 } const array[] ={
-	{ ".html", "Content-type: text/html\r\n"},
-	{ ".css", "Content-type: text/css\r\n"},
-	{ ".js", "Content-type: text/javascript\r\n"}
+	{ ".html",  "Content-type: text/html\r\n"       },
+	{ ".css" ,  "Content-type: text/css\r\n"        },
+	{ ".js"  ,  "Content-type: text/javascript\r\n" },
+	{ ".json",  "Content-type: application/json\r\n"}
 	/* more will follow soon */
 };
 
