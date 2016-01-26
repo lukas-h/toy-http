@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/lukas-h/toy-http.svg?branch=master)](https://travis-ci.org/lukas-h/toy-http)  
 lightweight embeddable http service,
 providing static site hosting.  
-Zero dependency alternative to node's `http_server`  
+Zero dependency alternative to node's `http-server`  
 designed for unix-like platforms
 For more advanced usage you can set three arguments:  
 1. Port (numeric)  
@@ -23,7 +23,7 @@ example: `toy-http 8080 /var/www 30`
   
 I wrote toy-http to test the http protocol and not to make a project
 for serious usage. It is now at the point to be a small alternative to
-other servers for static hosting like the `http_server` of the nodejs project.
+other servers that offer static hosting.
 The server is ideal for hosting the current folder to test websites, aso.
 
 ## platforms
