@@ -29,6 +29,7 @@
 *.hex
 main
 toy-http
+service
 
 # Debug files
 *.dSYM/
