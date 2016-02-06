@@ -49,6 +49,7 @@ and exit functions.
 
 ## files
 `toy-http.c` <- the main file for the standalone server  
+`start-toy-http` <- a small script that starts the standalone server as daemon  
 `install` and `Makefile` <- scripts to build the standalone server  
 `index.html` <- a html file for testing    
 `service.c` and `service.h` <- the library files

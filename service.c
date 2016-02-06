@@ -162,7 +162,9 @@ int serve(int http_port, int max_connections, char *serve_directory){
 			
 			shutdown(client, SHUT_RDWR);
 			close(client);
-			return 0;
+
+			//return 0;
+			_exit(0);
 		}
 		close(client);
 	}

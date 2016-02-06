@@ -9,5 +9,5 @@ clean:
 
 install: toy-http
 	install -m 0755 toy-http /usr/local/bin
-
+	install -m 0755 start-toy-http /usr/local/bin
 .PHONY: install

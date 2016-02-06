@@ -12,6 +12,7 @@ read ans
 if [ $ans = y -o $ans = Y -o $ans = yes -o $ans = Yes -o $ans = YES ]
 then
 sudo cp toy-http /usr/local/bin/
+sudo cp start-toy-http /usr/local/bin/
 fi
 
 echo "toy-http installed ..."
