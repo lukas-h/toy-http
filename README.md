@@ -70,7 +70,8 @@ It only needs a unix-like environment with C compiler and the posix API.
 Windows is supported with CygWin (or something similar)
 #### preferred C compilers:
 - gcc
-- clang
+- clang  
+
 ## licensing
 This project is licensed under the GNU LGPL v3 or later (the library)  
 and the standalone server under GNU AGPL v3 or later.
