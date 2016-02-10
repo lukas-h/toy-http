@@ -1,6 +1,7 @@
 ![](favicon.png)
 # toy-http
-[![Build Status](https://travis-ci.org/lukas-h/toy-http.svg?branch=master)](https://travis-ci.org/lukas-h/toy-http)  
+[![Build Status](https://travis-ci.org/lukas-h/toy-http.svg?branch=master)](https://travis-ci.org/lukas-h/toy-http)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)  
 lightweight embeddable http service,
 providing static site hosting.  
 Zero dependency alternative to node's `http-server`  
