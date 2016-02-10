@@ -6,18 +6,7 @@ lightweight embeddable http service,
 providing static site hosting.  
 Not only zero-configuration, also zero dependency alternative to node's [http-server](https://github.com/indexzero/http-server)   
 designed for unix-like platforms (Linux, FreeBSD, macOSx, ...)
-## Installation
-1. download from github.
-2. open a terminal and `cd` into the repository
-3. type `make` in to compile and link the source code (check the [dependencies](#dependencies))
-4. type `sudo make install` to move it 
 
-## Usage
-After the installation, you can use the command `toy-http`.
-### Arguments
-If you call the command without any arguments, it'll run in the actual folder.
-For more advanced usage, can set as first argument the folder or port. Then the folder and
-as third argument how many connections are possible at once.
 ## features
 - support for GET and HEAD requests  
 - stable error and interruption management  
@@ -32,6 +21,19 @@ I wrote toy-http to test the http protocol and not to make a project
 for serious usage. It is now at the point to be a small alternative to
 other servers that offer static hosting.
 The server is ideal for hosting the current folder to test websites, aso.
+
+## Installation
+1. download from github.
+2. open a terminal and `cd` into the repository
+3. type `make` in to compile and link the source code (check the [dependencies](#dependencies))
+4. type `sudo make install` to move it 
+
+## Usage
+After the installation, you can use the command `toy-http`.
+### Arguments
+If you call the command without any arguments, it'll run in the actual folder.
+For more advanced usage, can set as first argument the folder or port. Then the folder and
+as third argument how many connections are possible at once.
 
 ## platforms
 Because of the dependencies to the BSD-Socket API and the Posix programming interface,
