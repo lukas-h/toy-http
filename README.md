@@ -45,11 +45,21 @@ hint: for embedding, it could be useful to modificate the signal handlers
 and exit functions.
 
 ## files
+- *LICENSE*  license file  
+- *Makefile*  Makefile to build toy-http from the sources  
+- *README.md*  this file
+- *favicon.png*  the logo
+- *index.html*  test html document
+- *install*  alternative Makefile, useful if the program `make` isn't installed, then you can use it by executing `chmod 777 ./install && ./install`
+- *service.c*  C source file of the library
+- *service.h*  C header of the library
+- *start-toy-http*  starter, to execute **toy-http** as a system daemon. It is required to install the program `daemon` to use this script-
+- *toy-http.c*  the main source file of the standalone server
 
 ## dependencies 
 **toy-http** has nearly no dependencies.  
 It only needs a unix-like environment with C compiler and the posix API.
-supported is:
+#### supported OS:
 - (GNU)Linux
 - MacOSx
 - FreeBSD, OpenBSD, NetBSD, DragonflyBSD
@@ -57,11 +67,10 @@ supported is:
 - and every other OS with  
 - Solaris (maybe)  
 - and more  
-preferred C compilers:
+Windows is supported with CygWin (or something similar)
+#### preferred C compilers:
 - gcc
 - clang
-  
-Windows is supported with CygWin (or something similar)
 ## licensing
 This project is licensed under the GNU LGPL v3 or later (the library)  
 and the standalone server under GNU AGPL v3 or later.
