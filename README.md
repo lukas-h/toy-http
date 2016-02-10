@@ -4,8 +4,8 @@
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)  
 lightweight embeddable http service,
 providing static site hosting.  
-Zero dependency alternative to node's `http-server`  
-designed for unix-like platforms
+Not only zero-configuration, also zero dependency alternative to node's [http-server](https://github.com/indexzero/http-server)   
+designed for unix-like platforms  
 For more advanced usage you can set three arguments:  
 1. Port (numeric)  
 2. Max. Connections at once (numeric)  
