@@ -22,30 +22,18 @@ for serious usage. It is now at the point to be a small alternative to
 other servers that offer static hosting.
 The server is ideal for hosting the current folder to test websites, aso.
 
-## Installation
+## installation
 1. download from github.
 2. open a terminal and `cd` into the repository
 3. type `make` in to compile and link the source code (check the [dependencies](#dependencies))
 4. type `sudo make install` to move it 
 
-## Usage
+## usage
 After the installation, you can use the command `toy-http`.
-### Arguments
+#### arguments
 If you call the command without any arguments, it'll run in the actual folder.
 For more advanced usage, can set as first argument the folder or port. Then the folder and
 as third argument how many connections are possible at once.
-
-## platforms
-Because of the dependencies to the BSD-Socket API and the Posix programming interface,
-toy-http is only available for unix platforms like:
-- linux  
-- FreeBSD, NetBSD, OpenBSD and other BSD derivates  
-- GNU Hurd  
-- MacOSx  
-- Solaris (maybe)  
-- and more  
-  
-Windows is supported with CygWin (or something similar)
 
 ## embed it!
 You can embed it into your applications, simply add `service.h` and `service.c` to your project  
@@ -57,12 +45,23 @@ hint: for embedding, it could be useful to modificate the signal handlers
 and exit functions.
 
 ## files
-`toy-http.c` <- the main file for the standalone server  
-`start-toy-http` <- a small script that starts the standalone server as daemon  
-`install` and `Makefile` <- scripts to build the standalone server  
-`index.html` <- a html file for testing    
-`service.c` and `service.h` <- the library files
 
+## dependencies 
+**toy-http** has nearly no dependencies.  
+It only needs a unix-like environment with C compiler and the posix API.
+supported is:
+- (GNU)Linux
+- MacOSx
+- FreeBSD, OpenBSD, NetBSD, DragonflyBSD
+- GNU Hurd
+- and every other OS with  
+- Solaris (maybe)  
+- and more  
+preferred C compilers:
+- gcc
+- clang
+  
+Windows is supported with CygWin (or something similar)
 ## licensing
 This project is licensed under the GNU LGPL v3 or later (the library)  
 and the standalone server under GNU AGPL v3 or later.
