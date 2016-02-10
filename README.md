@@ -5,13 +5,19 @@
 lightweight embeddable http service,
 providing static site hosting.  
 Not only zero-configuration, also zero dependency alternative to node's [http-server](https://github.com/indexzero/http-server)   
-designed for unix-like platforms  
-For more advanced usage you can set three arguments:  
-1. Port (numeric)  
-2. Max. Connections at once (numeric)  
-3. Source directory (path)  
-example: `toy-http 8080 /var/www 30`
+designed for unix-like platforms (Linux, FreeBSD, macOSx, ...)
+## Installation
+1. download from github.
+2. open a terminal and `cd` into the repository
+3. type `make` in to compile and link the source code (check the [dependencies](#dependencies))
+4. type `sudo make install` to move it 
 
+## Usage
+After the installation, you can use the command `toy-http`.
+### Arguments
+If you call the command without any arguments, it'll run in the actual folder.
+For more advanced usage, can set as first argument the folder or port. Then the folder and
+as third argument how many connections are possible at once.
 ## features
 - support for GET and HEAD requests  
 - stable error and interruption management  
