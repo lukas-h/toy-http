@@ -59,6 +59,7 @@ and exit functions.
 ## dependencies 
 **toy-http** has nearly no dependencies.  
 It only needs a unix-like environment with C compiler and the posix API.
+
 #### supported OS:
 - (GNU)Linux
 - MacOSx
@@ -68,6 +69,7 @@ It only needs a unix-like environment with C compiler and the posix API.
 - Solaris (maybe)  
 - and more  
 Windows is supported with CygWin (or something similar)
+
 #### preferred C compilers:
 - gcc
 - clang  
