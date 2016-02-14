@@ -328,6 +328,6 @@ static int http_service(int client){
 		}
 	}
 	fclose(f);
-	buf[0]="\0"; // needless
+	buf[0]='\0'; // needless
 	return 0;
 }
