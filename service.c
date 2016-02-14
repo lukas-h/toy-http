@@ -261,7 +261,7 @@ static int http_service(int client){
 		return 1;
 	}
 	if(sscanf(buf, "%7s %127s", request, url) < 2){
-		fprintf(stderr, "warning: parsing error %s\n", buf);
+		fprintf(stderr, "warning: parsing error: \'%s\'\n", buf);
 		return 1;
 	}
 	
@@ -328,5 +328,6 @@ static int http_service(int client){
 		}
 	}
 	fclose(f);
+	buf="\0"; // needless
 	return 0;
 }
