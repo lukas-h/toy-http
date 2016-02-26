@@ -26,7 +26,6 @@
 
 int run_server(int port, int max_connections, char *serve_dir);
 int is_numeric(char *str);
-int is_path(char *str);
 int helppages(char *str);
 void help(void);
 
@@ -43,7 +42,7 @@ int main(int argc, char *argv[]){
 				if(is_numeric(argv[1])){
 					err=run_server(atoi(argv[1]), MAX_CONNECTIONS, SERVE_DIRECTORY);
 				}
-				else if(is_path(argv[1])){
+				else if(!is_numeric(argv[1])){
 					err=run_server(HTTP_PORT, MAX_CONNECTIONS, argv[1]);
 				}
 				else{
@@ -54,12 +53,12 @@ int main(int argc, char *argv[]){
 			}
 		break;
 		case 3:
-			if(is_numeric(argv[1]) && is_path(argv[2])){
+			if(is_numeric(argv[1]) && !is_numeric(argv[2])){
 				err=run_server(atoi(argv[1]), MAX_CONNECTIONS, argv[2]);
 			}
 		break;
 		case 4:
-			if(is_numeric(argv[1]) && is_path(argv[2]) && is_numeric(argv[3])){
+			if(is_numeric(argv[1]) && !is_numeric(argv[2]) && is_numeric(argv[3])){
 				err=run_server(atoi(argv[1]), atoi(argv[3]), argv[2]);
 			}
 		break;
@@ -87,17 +86,6 @@ int is_numeric(char *str){
 		str++;
 	} while(*str);
 	return 1;
-}
-
-int is_path(char *str){
-	int val=0;
-	do{
-		if(isalpha(*str)){ val++; }
-		if(*str=='/'){ val++; }
-		if(*str=='.'){ val++; }
-		str++;
-	} while(*str);
-	return (val) ? 1 : 0;
 }
 
 void help(){
