@@ -35,15 +35,6 @@ If you call the command without any arguments, it'll run in the actual folder.
 For more advanced usage, can set as first argument the folder or port. Then the folder and
 as third argument how many connections are possible at once.
 
-## embed it!
-You can embed it into your applications, simply add `service.h` and `service.c` to your project  
-and use this function: ` int serve(int http_port, int max_connections, char *serve_directory);`.  
-`max_connections` is the maximum number of clients that can be connected at once.  
-`serve_directory` is the folder with the ressources and files that are hosted.  
-
-hint: for embedding, it could be useful to modificate the signal handlers
-and exit functions.
-
 ## files
 - *LICENSE*  license file  
 - *Makefile*  Makefile to build toy-http from the sources  
@@ -75,6 +66,5 @@ Windows is supported with CygWin (or something similar)
 - clang  
 
 ## licensing
-This project is licensed under the GNU LGPL v3 or later (the library)  
-and the standalone server under GNU AGPL v3 or later.
+This project is licensed under the GNU AGPL v3 or later.
 Copyright (C) 2015, 2016 Lukas Himsel

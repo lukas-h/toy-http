@@ -1,8 +1,7 @@
 # Copyright (C) 2015 Lukas Himsel; Licensed under GNU GPL v2 (or later)
-toy-http: toy-http.o service.o
+toy-http: toy-http.o
 	cc -c toy-http.c
-	cc -c service.c
-	cc -o toy-http toy-http.o service.o
+	cc -o toy-http toy-http.o
 
 clean:
 	rm *.o
