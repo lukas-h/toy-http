@@ -5,6 +5,7 @@
 lightweight embeddable http service,
 providing static site hosting.  
 Not only zero-configuration, also zero dependency alternative to node's [http-server](https://github.com/indexzero/http-server)   
+It's perfect for people who don't want to install node and all it's dependencies for only a webserver!!
 designed for unix-like platforms (Linux, FreeBSD, mac OS X, ...)
 
 ## features
