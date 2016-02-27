@@ -33,12 +33,13 @@
 
 
 /*
- * --- defaults ---
+ * --- defaults & definitions ---
  */
-#define DEFAULT_FILE     "index.html"
-#define HTTP_PORT        8976
-#define MAX_CONNECTIONS  1024
-#define SERVE_DIRECTORY  "."
+#define DEFAULT_FILE	"index.html"
+#define HTTP_PORT		8976
+#define MAX_CONNECTIONS	1024
+#define SERVE_DIRECTORY	"."
+#define FILE_CHUNK_SIZE	512U
 
 /*
  * --- HTTP error messages ---
@@ -51,6 +52,7 @@ const char *HTTP_ERR_404 = "HTTP/1.0 404 Not Found\r\nContent-Type: text/html\r\
 	
 const char *HTTP_ERR_403 = "HTTP/1.0 403 Forbidden\r\nContent-Type: text/html\r\nContent-length: 91\r\n\r\n"
 	"<html><head><title>Error</title></head><body><hr><h1>No permission.</h1><hr></body></html>";
+
 /*
  * --- storage for mime types ---
  */
@@ -64,21 +66,14 @@ struct key_val_t{
 	{ ".json",  "Content-type: application/json\r\n"}
 };
 
-#define PORT_ERR   1
-#define BIND_ERR   2
-#define SOCKET_ERR 3
-#define LISTEN_ERR 4
-#define PATH_ERR   5
-#define ACCEPT_ERR 6
-#define FORK_ERR   7
-
 static int parse_args(int argc, char *argv[]);
 static int is_numeric(char *str);
-static void version(void);
-static void help(void);
-static long file_attributes(char *filename);
+static void inline version(void);
+static void inline help(void);
+
+static ssize_t file_attributes(char *filename);
 static char *get_content_type(char *filename);
-static int recv_line(int fd, char *buf, int len);
+static ssize_t recv_line(int fd, char *buf, size_t len);
 static int http_service(int client); // connection with client
 
 /*
@@ -91,9 +86,13 @@ static int serve_dir = 0;
 /*
  * --- error and signal handling ---
  */
+#define error(msg)		fprintf(stderr, "\033[1;41merror:\033[0m %s\n", (msg))
+#define warning(msg)	fprintf(stderr, "\033[1;43mwarning:\033[0m %s\n", (msg))
+#define info(msg)		fprintf(stdout, "\033[1;44minfo:\033[0m %s\n", (msg))
+
 #define SET_FD 1
 #define CLOSE_FD 2
-static void getter_fd(int fd, int client, int instr){
+static void handle_fd(int fd, int client, int instr){
 	static int f1, f2;
 	
 	if(instr==SET_FD){
@@ -110,59 +109,49 @@ static void getter_fd(int fd, int client, int instr){
 		close(f2);
 	}
 }
-
 static void abort_program(int signum){
-	getter_fd(0, 0, CLOSE_FD);
+	handle_fd(0, 0, CLOSE_FD);
 	
 	switch(signum){
-		case SIGABRT:
-			fprintf(stderr, "abnormal termination: exit\n");
-			exit(1);
+		case SIGABRT: case SIGHUP:
+			error("abnormal termination: exit");
+			_exit(1);
 		break;
-		case SIGILL:
-			fprintf(stderr, "invalid instruction: please contact the maintainer\n");
-			exit(1);
+		case SIGILL: case SIGSEGV:
+			error("invalid instruction: please contact the maintainer");
+			_exit(1);
 		break;
 		case SIGINT:
-			exit(0);
+			info("exit");
+			_exit(0);
 		break;
-		case SIGSEGV:
-			fprintf(stderr, "invalid memory access: please contact the maintainer\n");
-			exit(1);
-		break;
-		case SIGTERM:
-			fprintf(stderr, "termination request: exit\n");
+		case SIGTERM: case SIGKILL:
+			info("termination request: exit");
+			_exit(0);
 		break;
 		default:
-			exit(1);
+			_exit(1);
 		break;
 	}
-	exit(1); // sicherheitshalber
+	_exit((signum > 0) ? 1 : 0); // sicherheitshalber
 }
 
 /*
- * --- main server function ---
+ * --- SERVER MAIN ---
  */
 int main(int argc, char *argv[]){
 	char *serve_directory = ".";
 
+	int fd, client, pid, err_cnt;
+	struct sockaddr_in addr, client_addr;
+	socklen_t siz;
+
 	if(!parse_args(argc, argv)){
 		return 1;
 	}
-	
-	if(serve_dir>0){
-		serve_directory = argv[serve_dir];
-	}
 
-	if(http_port >  65535){
-		fprintf(stderr, "error: illegal port\n");
-		return PORT_ERR;
-	}
+	printf("\033[1;31mtoy-http\033[0m\n--------\n");
 
-		int fd, client, pid, err_cnt;
-	struct sockaddr_in addr, client_addr;
-	socklen_t siz;
-	
 	signal(SIGABRT, abort_program); //signal handling
 	signal(SIGILL, abort_program);
 	signal(SIGINT, abort_program);
@@ -170,14 +159,18 @@ int main(int argc, char *argv[]){
 	signal(SIGTERM, abort_program);
 
 	if(http_port >  65535){
-		fprintf(stderr, "error: illegal port\n");
-		return PORT_ERR;
+		error("illegal port");
+		abort_program(-1);
+	}
+
+	if(serve_dir>0){
+		serve_directory = argv[serve_dir];
 	}
 
 	fd = socket(PF_INET, SOCK_STREAM, 0);
 	if(fd == -1){
-		fprintf(stderr, "error: can not create new socket\n");
-		return SOCKET_ERR;
+		error("can not create new socket");
+		abort_program(-1);
 	}
 	
 	addr.sin_family = AF_INET;
@@ -185,34 +178,36 @@ int main(int argc, char *argv[]){
 	addr.sin_addr.s_addr = INADDR_ANY;
 	
 	if(bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in))==-1){
-		fprintf(stderr, "error: bind() failed.\n\033[1;31mIs another server running on this port?\033[0m\n");
-		return BIND_ERR;
+		error("bind() failed.");
+		printf(" >Is another server running on this port?\n");
+		abort_program(-1);
 	}
 	
 	if(listen(fd, max_connections)==-1){
-		fprintf(stderr, "error: listen() failed\n");
-		return LISTEN_ERR;
+		error("listen() failed");
+		abort_program(-1);
 	}
 	
 	if(chdir(serve_directory)){
-		fprintf(stderr, "error: invalid path or can not set\n");
-		return PATH_ERR;
+		error("invalid path or can not set");
+		abort_program(-1);
 	}
 
-	printf("\033[1;31mtoy-http\033[0m\n--------\nHost: http://127.0.0.1:%d\n\nCtrl-C to abort.\n", http_port);
+	info("Server running!");
+	printf(" >host: http://127.0.0.1:%d\n >\033[1mCtrl-C\033[0m to abort.\n", http_port);
 	
 	while(1){
 		
 		siz = sizeof(struct sockaddr_in);
 		client = accept(fd, (struct sockaddr *)&client_addr, &siz);
 		
-		getter_fd(fd, client, SET_FD); //signal handling
+		handle_fd(fd, client, SET_FD); //signal handling
 		
 		if(client==-1){
-			fprintf(stderr,"error: accept() failed\n");
+			error("accept() failed");
 			err_cnt++;
 			if(err_cnt > 2){
-				return ACCEPT_ERR;
+				abort_program(-1);
 			}
 			continue;
 		} else{
@@ -221,11 +216,11 @@ int main(int argc, char *argv[]){
 		
 		pid = fork();
 		if(pid==-1){
-			fprintf(stderr, "error: fork() failed\n");
+			error("fork() failed");
 			err_cnt++;
 			if(err_cnt > 2){
 				close(client);
-				return FORK_ERR;
+				abort_program(-1);
 			}
 			continue;
 		}
@@ -252,12 +247,12 @@ int main(int argc, char *argv[]){
  * --- argument parser & help display ---
  */
 static int parse_args(int argc, char *argv[]){
-	unsigned int num_count=0, path_count=0, i;
+	size_t num_count, path_count, i;
 	if(argc==1){
 		return 1;
 	}
 	else if(argc > 0){
-		for(i=1; i < argc && i < 5; i++){
+		for(i=1, num_count=0, path_count=0; i < argc && i < 5; i++){
 			if(strcmp(argv[i], "--help")==0 || strcmp(argv[i], "-h")==0){
 				help();
 				return 0;
@@ -301,7 +296,7 @@ static int parse_args(int argc, char *argv[]){
 
 static int is_numeric(char *str){
 	do{
-		if( !(*str>='0' && *str<='9')){
+		if( !(*str>='0' && *str<='9') ){
 			return 0;
 		}
 		str++;
@@ -309,15 +304,13 @@ static int is_numeric(char *str){
 	return 1;
 }
 
-static void help(){
-	puts("\033[1;31mtoy-http\033[0m\n--------\n"
-	"Usage: \033[1;34mtoy-http\033[0m <PORT> <SERVE-FOLDER> <MAX-CONNECTIONS>\n"
+static inline void help(){
+	puts("Usage: \033[1;34mtoy-http\033[0m <PORT> <SERVE-FOLDER> <MAX-CONNECTIONS>\n"
 	"You can also use it without any arguments,\n to run it in the actual folder.");
 }
 
-static void version(){
-	puts("\033[1;31mtoy-http\033[0m\n--------\n"
-		"Version: 0.0\nCopyright (C) 2015, 2016 Lukas Himsel\nlicensed under GNU AGPL v3\n"
+static inline void version(){
+	puts("Version: 0.0\nCopyright (C) 2015, 2016 Lukas Himsel\nlicensed under GNU AGPL v3\n"
 	    "This program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\n"
 	    "under certain conditions; see `www.gnu.org/licenses/gpl.html\' for details.\n");
 }
@@ -330,7 +323,7 @@ static void version(){
 #define FILE_IS_DIR  -1
 #define FILE_NO_PERM -2
 
-static long file_attributes(char *filename){
+static ssize_t file_attributes(char *filename){
 	struct stat info;
 
 	if(strncmp(filename, "..", 2)==0 || filename[0]=='/'){
@@ -358,7 +351,7 @@ static long file_attributes(char *filename){
 }
 
 static char *get_content_type(char *filename){
-	unsigned long index, len_name, len_key;
+	size_t index, len_name, len_key;
 	len_name = strlen(filename);
 	char *p;
 	for(index=0; index < sizeof(array) / sizeof(struct key_val_t); index++){
@@ -376,8 +369,9 @@ static char *get_content_type(char *filename){
 	return NULL;
 }
 
-static int recv_line(int fd, char *buf, int len){
-	unsigned int i=0, err=1;
+static ssize_t recv_line(int fd, char *buf, size_t len){
+	size_t i=0;
+	ssize_t err=1;
 	while((i < len-1) && err==1){
 		err = recv(fd, &(buf[i]), 1, 0);
 		if(buf[i]=='\n'){ break; }
@@ -387,22 +381,21 @@ static int recv_line(int fd, char *buf, int len){
 		i--;
 	}
 	buf[i] = '\0';
-	return i;
+	return err;
 }
 
 static int http_service(int client){
-	char buf[512], request[8], url[256];
+	char buf[FILE_CHUNK_SIZE]="\0", request[8]="\0", url[256]="\0";
 	char *filename, *content_type;
-	int len;
-	long file_size;
+	ssize_t len, file_size;
 	FILE *f;
 	
 	if(recv_line(client, buf, (sizeof(buf)-1) )==0){
-		fprintf(stderr, "warning: can not receive request\n");
+		warning("can not receive request");
 		return 1;
 	}
 	if(sscanf(buf, "%7s %255s", request, url) < 2){
-		fprintf(stderr, "warning: parsing error: \'%s\'\n", buf);
+		warning("parsing error");
 		return 1;
 	}
 	
@@ -412,7 +405,8 @@ static int http_service(int client){
 		
 		send(client, HTTP_ERR_501, strlen(HTTP_ERR_501), 0);
 		
-		fprintf(stderr, "warning: request method `%s` not supported\n", request);
+		warning("request method not supported");
+		printf(" >method: %s\n", request);
 		return 0;
 	}
 
@@ -458,13 +452,12 @@ static int http_service(int client){
 	/* if not only HEAD */
 	if(strcmp(request, "GET") == 0){
 		while(!feof(f)){
-			len = fread(buf, 1, 256, f);
+			len = fread(buf, 1, FILE_CHUNK_SIZE, f);
 			if(len){
 				send(client, buf, len, 0);
 			}
 		}
 	}
 	fclose(f);
-	//buf[0]='\0'; // needless
 	return 0;
 }
