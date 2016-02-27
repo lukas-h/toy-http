@@ -1,4 +1,4 @@
-![](favicon.png)
+![](http://www.lukashimsel.me/pics/toy-http.png)
 # toy-http
 [![Build Status](https://travis-ci.org/lukas-h/toy-http.svg?branch=one-file)](https://travis-ci.org/lukas-h/toy-http)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)  
@@ -37,7 +37,7 @@ After the installation, you can use the command `toy-http`.
 If you call the command without any arguments, it'll run in the actual folder.
 For more advanced usage, can set as first argument the folder or port. Then the folder and
 as third argument how many connections are possible at once.
-
+![](http://www.lukashimsel.me/pics/toy-http2.png)
 ## files
 - *LICENSE*  license file  
 - *Makefile*  Makefile to build toy-http from the sources  
