@@ -5,8 +5,8 @@
 lightweight embeddable http service,
 providing static site hosting.  
 Not only zero-configuration, also zero dependency alternative to node's [http-server](https://github.com/indexzero/http-server)   
-It's perfect for people who don't want to install node and all it's dependencies for only a webserver!!
-designed for unix-like platforms (Linux, FreeBSD, mac OS X, ...)
+It's perfect for people who don't want to install node and all its dependencies for only a webserver!!  
+Designed for unix-like platforms (Linux, FreeBSD, mac OS X, ...)
 
 ## features
 - support for GET and HEAD requests  
@@ -36,7 +36,7 @@ I will add a binary package for Debian- and Ubuntu-based Systems soon!
 After the installation, you can use the command `toy-http`.
 #### arguments
 If you call the command without any arguments, it'll run in the actual folder.
-For more advanced usage, can set as first argument the folder or port. Then the folder and
+For more advanced usage, you can set as first argument the folder or port. Then the folder and
 as third argument how many connections are possible at once.
 ![](http://www.lukashimsel.me/pics/toy-http2.png)
 ## files
