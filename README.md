@@ -37,7 +37,7 @@ After the installation, you can use the command `toy-http`.
 #### arguments
 If you call the command without any arguments, it'll run in the actual folder.
 For more advanced usage, you can set as first argument the folder or port. Then the folder and
-as third argument how many connections are possible at once.
+as third argument how many connections are possible at once.  
 ![](http://www.lukashimsel.me/pics/toy-http2.png)
 ## files
 - *LICENSE*  license file  
