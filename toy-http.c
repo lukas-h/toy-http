@@ -31,7 +31,6 @@
 #include <arpa/inet.h>
 #include <sys/stat.h>
 
-
 /*
  * --- defaults & definitions ---
  */
@@ -60,9 +59,9 @@ struct key_val_t{
 	char *key;
 	char *val;
 } const array[] ={
-	{ ".html",  "Content-type: text/html\r\n"       },
-	{ ".css" ,  "Content-type: text/css\r\n"        },
-	{ ".js"  ,  "Content-type: text/javascript\r\n" },
+	{ ".html",  "Content-type: text/html\r\n"		},
+	{ ".css" ,  "Content-type: text/css\r\n"		},
+	{ ".js"  ,  "Content-type: text/javascript\r\n"	},
 	{ ".json",  "Content-type: application/json\r\n"}
 };
 
@@ -133,7 +132,8 @@ static void abort_program(int signum){
 			_exit(1);
 		break;
 	}
-	_exit((signum > 0) ? 1 : 0); // sicherheitshalber
+	
+	_exit((signum > 0) ? 1 : 0);
 }
 
 /*
@@ -237,9 +237,8 @@ int main(int argc, char *argv[]){
 		}
 		close(client);
 	}
-	
 	close(fd);
-
+	
 	return 0;
 }
 
@@ -291,6 +290,7 @@ static int parse_args(int argc, char *argv[]){
 		help();
 		return 0;
 	}
+	
 	return 1;
 }
 
@@ -301,6 +301,7 @@ static int is_numeric(char *str){
 		}
 		str++;
 	} while(*str);
+	
 	return 1;
 }
 
@@ -329,20 +330,15 @@ static ssize_t file_attributes(char *filename){
 	if(strncmp(filename, "..", 2)==0 || filename[0]=='/'){
 		return FILE_NO_PERM;
 	}
-
 	if(stat(filename, &info)==-1){
 		return NOT_EXISTING;
 	}
-	
 	if(!(info.st_mode & S_IRUSR)){
 		return FILE_NO_PERM;
 	}
-
-
 	if(S_ISDIR(info.st_mode)){
 		return FILE_IS_DIR;
 	}
-
 	if(!info.st_size){
 		return 0;
 	}
@@ -366,6 +362,7 @@ static char *get_content_type(char *filename){
 			}
 		}
 	}
+	
 	return NULL;
 }
 
@@ -381,6 +378,7 @@ static ssize_t recv_line(int fd, char *buf, size_t len){
 		i--;
 	}
 	buf[i] = '\0';
+	
 	return err;
 }
 
@@ -459,5 +457,6 @@ static int http_service(int client){
 		}
 	}
 	fclose(f);
+	
 	return 0;
 }
