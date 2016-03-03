@@ -379,7 +379,7 @@ static ssize_t recv_line(int fd, char *buf, size_t len){
 	}
 	buf[i] = '\0';
 	
-	return err;
+	return i;
 }
 
 static int http_service(int client){
