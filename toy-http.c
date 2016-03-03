@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #include <stdio.h>
@@ -45,10 +45,10 @@
  */
 const char *HTTP_ERR_501 = "HTTP/1.0 501 Not Implemented\r\nContent-Type: text/html\r\nContent-length: 104\r\n\r\n"
 	"<html><head><title>Error</title></head><body><hr><h1>HTTP method not implemented.</h1><hr></body></html>";
-	
+
 const char *HTTP_ERR_404 = "HTTP/1.0 404 Not Found\r\nContent-Type: text/html\r\nContent-length: 91\r\n\r\n"
 	"<html><head><title>Error</title></head><body><hr><h1>File not found.</h1><hr></body></html>";
-	
+
 const char *HTTP_ERR_403 = "HTTP/1.0 403 Forbidden\r\nContent-Type: text/html\r\nContent-length: 91\r\n\r\n"
 	"<html><head><title>Error</title></head><body><hr><h1>No permission.</h1><hr></body></html>";
 
@@ -93,7 +93,7 @@ static int serve_dir = 0;
 #define CLOSE_FD 2
 static void handle_fd(int fd, int client, int instr){
 	static int f1, f2;
-	
+
 	if(instr==SET_FD){
 		if(fd){
 			f1=fd;
@@ -110,7 +110,7 @@ static void handle_fd(int fd, int client, int instr){
 }
 static void abort_program(int signum){
 	handle_fd(0, 0, CLOSE_FD);
-	
+
 	switch(signum){
 		case SIGABRT: case SIGHUP:
 			error("abnormal termination: exit");
@@ -132,7 +132,7 @@ static void abort_program(int signum){
 			_exit(1);
 		break;
 	}
-	
+
 	_exit((signum > 0) ? 1 : 0);
 }
 
@@ -172,22 +172,22 @@ int main(int argc, char *argv[]){
 		error("can not create new socket");
 		abort_program(-1);
 	}
-	
+
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(http_port);
 	addr.sin_addr.s_addr = INADDR_ANY;
-	
+
 	if(bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in))==-1){
 		error("bind() failed.");
 		printf(" >Is another server running on this port?\n");
 		abort_program(-1);
 	}
-	
+
 	if(listen(fd, max_connections)==-1){
 		error("listen() failed");
 		abort_program(-1);
 	}
-	
+
 	if(chdir(serve_directory)){
 		error("invalid path or can not set");
 		abort_program(-1);
@@ -195,14 +195,13 @@ int main(int argc, char *argv[]){
 
 	info("Server running!");
 	printf(" >host: http://127.0.0.1:%d\n >\033[1mCtrl-C\033[0m to abort.\n", http_port);
-	
+
 	while(1){
-		
 		siz = sizeof(struct sockaddr_in);
 		client = accept(fd, (struct sockaddr *)&client_addr, &siz);
-		
+
 		handle_fd(fd, client, SET_FD); //signal handling
-		
+
 		if(client==-1){
 			error("accept() failed");
 			err_cnt++;
@@ -213,7 +212,7 @@ int main(int argc, char *argv[]){
 		} else{
 			err_cnt=0;
 		}
-		
+
 		pid = fork();
 		if(pid==-1){
 			error("fork() failed");
@@ -226,19 +225,18 @@ int main(int argc, char *argv[]){
 		}
 		if(pid==0){
 			close(fd);
-			
 			http_service(client);
-			
+
 			shutdown(client, SHUT_RDWR);
 			close(client);
 
-			//return 0;
-			_exit(0);
+			return 0;
+			//_exit(0);
 		}
 		close(client);
 	}
 	close(fd);
-	
+
 	return 0;
 }
 
@@ -290,7 +288,7 @@ static int parse_args(int argc, char *argv[]){
 		help();
 		return 0;
 	}
-	
+
 	return 1;
 }
 
@@ -301,7 +299,7 @@ static int is_numeric(char *str){
 		}
 		str++;
 	} while(*str);
-	
+
 	return 1;
 }
 
@@ -342,7 +340,7 @@ static ssize_t file_attributes(char *filename){
 	if(!info.st_size){
 		return 0;
 	}
-	
+
 	return info.st_size;
 }
 
@@ -353,7 +351,7 @@ static char *get_content_type(char *filename){
 	for(index=0; index < sizeof(array) / sizeof(struct key_val_t); index++){
 		p = array[index].val;
 		len_key = strlen(array[index].key);
-		
+
 		if(len_key > len_name){
 			continue;
 		} else{
@@ -362,7 +360,7 @@ static char *get_content_type(char *filename){
 			}
 		}
 	}
-	
+
 	return NULL;
 }
 
@@ -378,7 +376,7 @@ static ssize_t recv_line(int fd, char *buf, size_t len){
 		i--;
 	}
 	buf[i] = '\0';
-	
+
 	return i;
 }
 
@@ -387,7 +385,7 @@ static int http_service(int client){
 	char *filename, *content_type;
 	ssize_t len, file_size;
 	FILE *f;
-	
+
 	if(recv_line(client, buf, (sizeof(buf)-1) )==0){
 		warning("can not receive request");
 		return 1;
@@ -396,13 +394,13 @@ static int http_service(int client){
 		warning("parsing error");
 		return 1;
 	}
-	
+
 	while(recv_line(client, buf, (sizeof(buf)-1) ) > 0);
-	
+
 	if( (strcmp(request, "GET")!=0) && (strcmp(request, "HEAD")!=0)){
-		
+
 		send(client, HTTP_ERR_501, strlen(HTTP_ERR_501), 0);
-		
+
 		warning("request method not supported");
 		printf(" >method: %s\n", request);
 		return 0;
@@ -411,7 +409,7 @@ static int http_service(int client){
 	if(url[strlen(url)-1]=='/'){
 		url[strlen(url)-1]='\0';
 	}
-	
+
 	filename = &(url[1]);
 	if(!strlen(filename)){
 		filename = DEFAULT_FILE;
@@ -429,13 +427,13 @@ static int http_service(int client){
 		send(client, HTTP_ERR_403, strlen(HTTP_ERR_403), 0);
 		return 0;
 	}
-	
+
 	f = fopen(filename, "r");
 	if(f==NULL){
 		send(client, HTTP_ERR_404, strlen(HTTP_ERR_404), 0);
 		return 0;
 	}
-	
+
 	send(client, "HTTP/1.0 200 OK\r\n", 17, 0);
 
 	/* add content information */
@@ -443,10 +441,10 @@ static int http_service(int client){
 	if(content_type!=NULL){
 		send(client, content_type, strlen(content_type), 0);
 	}
-	
+
 	sprintf(buf, "Content-length: %ld\r\n\r\n", file_size);
 	send(client, buf, strlen(buf), 0);
-	
+
 	/* if not only HEAD */
 	if(strcmp(request, "GET") == 0){
 		while(!feof(f)){
@@ -457,6 +455,6 @@ static int http_service(int client){
 		}
 	}
 	fclose(f);
-	
+
 	return 0;
 }
