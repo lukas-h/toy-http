@@ -45,7 +45,6 @@ as third argument how many connections are possible at once.
 - *README.md*  this file  
 - *favicon.png*  the logo  
 - *index.html*  test html document  
-- *install*  alternative Makefile, useful if the program `make` isn't installed, then you can use it by executing `chmod 777 ./install && ./install`  
 - *start-toy-http*  starter, to execute **toy-http** as a system daemon. It is required to install the program `daemon` to use this script!  
 - *toy-http.c*  the main source file of the standalone server  
 
