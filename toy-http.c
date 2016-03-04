@@ -157,6 +157,7 @@ int main(int argc, char *argv[]){
 	signal(SIGINT, abort_program);
 	signal(SIGSEGV, abort_program);
 	signal(SIGTERM, abort_program);
+	signal(SIGCHLD, SIG_IGN);
 
 	if(http_port >  65535){
 		error("illegal port");
