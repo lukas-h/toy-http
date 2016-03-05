@@ -170,7 +170,7 @@ int main(int argc, char *argv[]){
 		serve_directory = argv[serve_dir];
 	}
 
-	fd = socket(PF_INET, SOCK_STREAM, 0);
+	fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if(fd == -1){
 		error("can not create new socket");
 		abort_program(-1);
