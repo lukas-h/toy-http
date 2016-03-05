@@ -14,9 +14,7 @@ providing static site hosting.
 - run it as a daemon
 
 I wrote toy-http to test the http protocol and not to make a project
-for serious usage. It is now at the point to be a small alternative to
-other servers that can offer static hosting.
-The server is ideal for testing websites locally.
+for serious usage. But this server is perfect to for testing websites locally.
 
 ## installation
 1. download from github.
