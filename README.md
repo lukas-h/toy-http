@@ -23,7 +23,7 @@ for serious usage. But this server is perfect to for testing websites locally.
 5. type `sudo make install` to move it  
 
 #### Binary packages
-I will add a binary package for Debian- and Ubuntu-based Systems soon! 
+download [here](http://www.lukashimsel.me/projects.html#bin-toy-http)
 
 ## usage
 After the installation, you can use the command `toy-http`.
