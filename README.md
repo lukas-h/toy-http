@@ -22,6 +22,7 @@ for serious usage. But this server is perfect to for testing websites locally.
 3. open a terminal and `cd` into the repository
 4. type `make` in to compile
 5. type `sudo make install` to move it  
+
 #### Binary packages
 I will add a binary package for Debian- and Ubuntu-based Systems soon! 
 
