@@ -10,8 +10,7 @@ def make_request():
 		urllib2.urlopen("http://127.0.0.1:8976").read()
 		x+=1
 		print "Request ~%d" % x
-#		time.sleep(.100)
-
+		#time.sleep(.100)
 	
 try:
 	make_request()
