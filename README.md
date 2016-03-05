@@ -14,9 +14,7 @@ providing static site hosting.
 - run it as a daemon
 
 I wrote toy-http to test the http protocol and not to make a project
-for serious usage. It is now at the point to be a small alternative to
-other servers that can offer static hosting.
-The server is ideal for testing websites locally.
+for serious usage. But this server is perfect to for testing websites locally.
 
 ## installation
 1. download from github.
@@ -24,6 +22,7 @@ The server is ideal for testing websites locally.
 3. open a terminal and `cd` into the repository
 4. type `make` in to compile
 5. type `sudo make install` to move it  
+
 #### Binary packages
 I will add a binary package for Debian- and Ubuntu-based Systems soon! 
 
