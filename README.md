@@ -11,7 +11,6 @@ providing static site hosting.
 - fast file serving  
 - blocking function for parental folders of the serve folder  
 - less than 500 lines of source code  
-- run it as a daemon
 
 I wrote toy-http to test the http protocol and not to make a project
 for serious usage. But this server is perfect to for testing websites locally.
@@ -33,6 +32,9 @@ If you call the command without any arguments, it'll run in the actual folder.
 For more advanced usage, you can set as first argument the folder or port. Then the folder and
 as third argument how many connections are possible at once.  
 ![](http://www.lukashimsel.me/pics/toy-http2.png)
+
+#### run it as a daemon
+Use the command `toy-httpd` to execute it as a daemon, make sure you input the absolute path for the serve folder.
 
 ## dependencies 
 no dependencies to external libraries, just the C standard libraries and  
