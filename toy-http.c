@@ -44,13 +44,13 @@
  * --- HTTP error messages ---
  */
 const char *HTTP_ERR_501 = "HTTP/1.0 501 Not Implemented\r\nContent-Type: text/html\r\nContent-length: 104\r\n\r\n"
-	"<html><head><title>Error</title></head><body><hr><h1>HTTP method not implemented.</h1><hr></body></html>";
+	"<html><head><title>Error</title></head><body><hr><h1>HTTP method not implemented.</h1><hr><p>toy-http</p></body></html>";
 
 const char *HTTP_ERR_404 = "HTTP/1.0 404 Not Found\r\nContent-Type: text/html\r\nContent-length: 91\r\n\r\n"
-	"<html><head><title>Error</title></head><body><hr><h1>File not found.</h1><hr></body></html>";
+	"<html><head><title>Error</title></head><body><hr><h1>File not found.</h1><hr><p>toy-http</p></body></html>";
 
 const char *HTTP_ERR_403 = "HTTP/1.0 403 Forbidden\r\nContent-Type: text/html\r\nContent-length: 91\r\n\r\n"
-	"<html><head><title>Error</title></head><body><hr><h1>No permission.</h1><hr></body></html>";
+	"<html><head><title>Error</title></head><body><hr><h1>No permission.</h1><hr><p>toy-http</p></body></html>";
 
 /*
  * --- storage for mime types ---
@@ -59,10 +59,12 @@ struct key_val_t{
 	char *key;
 	char *val;
 } const array[] ={
-	{ ".html",  "Content-type: text/html\r\n"		},
-	{ ".css" ,  "Content-type: text/css\r\n"		},
+	{ ".html",  "Content-type: text/html\r\n"	},
+	{ ".htm" ,  "Content-type: text/html\r\n"	},
+	{ ".css" ,  "Content-type: text/css\r\n"	},
 	{ ".js"  ,  "Content-type: text/javascript\r\n"	},
-	{ ".json",  "Content-type: application/json\r\n"}
+	{ ".json",  "Content-type: application/json\r\n"},
+	{ ".pdf" ,  "Content-type: application/pdf\r\n"	},
 };
 
 static int parse_args(int argc, char *argv[]);
