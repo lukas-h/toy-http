@@ -38,7 +38,7 @@
 #define HTTP_PORT		8976
 #define MAX_CONNECTIONS	1024
 #define SERVE_DIRECTORY	"."
-#define FILE_CHUNK_SIZE	512U
+#define FILE_CHUNK_SIZE	4096U
 
 /*
  * --- HTTP error messages ---
