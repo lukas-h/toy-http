@@ -33,9 +33,6 @@ For more advanced usage, you can set as first argument the folder or port. Then 
 as third argument how many connections are possible at once.  
 ![](http://www.lukashimsel.me/pics/toy-http2.png)
 
-#### run it as a daemon
-Use the command `toy-httpd` to execute it as a daemon, make sure you input the absolute path for the serve folder.
-
 ## dependencies 
 no dependencies to external libraries, just the C standard libraries and  
  the posix API (preinstalled on all good unix-derivates) and socket api (included)  
