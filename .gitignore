@@ -33,3 +33,6 @@ service
 
 # Debug files
 *.dSYM/
+
+# Folders
+benchmark/
