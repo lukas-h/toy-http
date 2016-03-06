@@ -84,15 +84,14 @@ static int serve_dir = 0;
 #define SET_FD 1
 #define CLOSE_FD 2
 static void handle_fd(int fd, int instr){
-	static int f1;
-
-	if(instr==SET_FD){
-		if(fd){
-			f1=fd;
-		}
-	}
-	if(instr==CLOSE_FD){
-		close(f1);
+	static int f;
+	switch(instr){
+		case SET_FD:
+			f=fd? fd : -1;
+		break;
+		case CLOSE_FD:
+			close(f);
+		break;
 	}
 }
 static void abort_program(int signum){
@@ -181,6 +180,7 @@ int main(int argc, char *argv[]){
 
 	info("Server running!");
 	printf(" >host: http://127.0.0.1:%d\n >\033[1mCtrl-C\033[0m to abort.\n", http_port);
+	handle_fd(fd, SET_FD);
 
 	while(1){
 		siz = sizeof(struct sockaddr_in);
