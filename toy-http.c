@@ -389,7 +389,7 @@ static int http_service(int client){
 	ssize_t len, file_size;
 	FILE *f;
 
-	if(recv_line(client, buf, (sizeof(buf)-1) )==0){
+	if(recv_line(client, buf, (sizeof(buf)-1) )<=3){
 		warning("can not receive request");
 		return 1;
 	}
