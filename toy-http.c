@@ -83,25 +83,20 @@ static int serve_dir = 0;
 
 #define SET_FD 1
 #define CLOSE_FD 2
-static void handle_fd(int fd, int client, int instr){
-	static int f1, f2;
+static void handle_fd(int fd, int instr){
+	static int f1;
 
 	if(instr==SET_FD){
 		if(fd){
 			f1=fd;
 		}
-		if(client){
-			f2=client;
-		}
 	}
 	if(instr==CLOSE_FD){
 		close(f1);
-		shutdown(f2, SHUT_RDWR);
-		close(f2);
 	}
 }
 static void abort_program(int signum){
-	handle_fd(0, 0, CLOSE_FD);
+	handle_fd(0, CLOSE_FD);
 
 	switch(signum){
 		case SIGABRT: case SIGHUP:
@@ -190,9 +185,7 @@ int main(int argc, char *argv[]){
 	while(1){
 		siz = sizeof(struct sockaddr_in);
 		client = accept(fd, (struct sockaddr *)&client_addr, &siz);
-
-		handle_fd(fd, client, SET_FD); //signal handling
-
+		
 		if(client==-1){
 			error("accept() failed");
 			err_cnt++;
@@ -222,7 +215,6 @@ int main(int argc, char *argv[]){
 			close(client);
 
 			return 0;
-			//_exit(0);
 		}
 		close(client);
 	}
