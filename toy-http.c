@@ -31,18 +31,14 @@
 #include <arpa/inet.h>
 #include <sys/stat.h>
 
-/*
- * --- defaults & definitions ---
- */
+/* --- defaults & definitions --- */
 #define DEFAULT_FILE	"index.html"
 #define HTTP_PORT		8976
 #define MAX_CONNECTIONS	1024
 #define SERVE_DIRECTORY	"."
 #define FILE_CHUNK_SIZE	4096U
 
-/*
- * --- HTTP error messages ---
- */
+/* --- HTTP error messages --- */
 const char *HTTP_ERR_501 = "HTTP/1.0 501 Not Implemented\r\nContent-Type: text/html\r\nContent-length: 104\r\n\r\n"
 	"<html><head><title>Error</title></head><body><hr><h1>HTTP method not implemented.</h1><hr><p>toy-http</p></body></html>";
 
@@ -52,9 +48,7 @@ const char *HTTP_ERR_404 = "HTTP/1.0 404 Not Found\r\nContent-Type: text/html\r\
 const char *HTTP_ERR_403 = "HTTP/1.0 403 Forbidden\r\nContent-Type: text/html\r\nContent-length: 91\r\n\r\n"
 	"<html><head><title>Error</title></head><body><hr><h1>No permission.</h1><hr><p>toy-http</p></body></html>";
 
-/*
- * --- storage for mime types ---
- */
+/* --- storage for mime types --- */
 struct key_val_t{
 	char *key;
 	char *val;
@@ -77,16 +71,12 @@ static char *get_content_type(char *filename);
 static ssize_t recv_line(int fd, char *buf, size_t len);
 static int http_service(int client); // connection with client
 
-/*
- * --- globals ---
- */
+/* --- globals --- */
 static int http_port = HTTP_PORT;
 static int max_connections = MAX_CONNECTIONS;
 static int serve_dir = 0;
 
-/*
- * --- error and signal handling ---
- */
+/* --- error and signal handling --- */
 #define error(msg)		fprintf(stderr, "\033[1;41merror:\033[0m %s\n", (msg))
 #define warning(msg)	fprintf(stderr, "\033[1;43mwarning:\033[0m %s\n", (msg))
 #define info(msg)		fprintf(stdout, "\033[1;44minfo:\033[0m %s\n", (msg))
@@ -138,9 +128,7 @@ static void abort_program(int signum){
 	_exit((signum > 0) ? 1 : 0);
 }
 
-/*
- * --- SERVER MAIN ---
- */
+/* --- SERVER MAIN --- */
 int main(int argc, char *argv[]){
 	char *serve_directory = ".";
 
@@ -243,9 +231,7 @@ int main(int argc, char *argv[]){
 	return 0;
 }
 
-/*
- * --- argument parser & help display ---
- */
+/* --- argument parser & help display --- */
 static int parse_args(int argc, char *argv[]){
 	size_t num_count, path_count, i;
 	if(argc==1){
@@ -318,9 +304,7 @@ static inline void version(){
 }
 
 
-/*
- * --- server procedures and file handling ---
- */
+/* --- server procedures and file handling --- */
 #define NOT_EXISTING  0
 #define FILE_IS_DIR  -1
 #define FILE_NO_PERM -2
@@ -420,14 +404,16 @@ static int http_service(int client){
 	}
 
 	file_size = file_attributes(filename);
+	
+	if(file_size==FILE_IS_DIR){
+		strcat(filename, "/index.html");
+		file_size = file_attributes(filename);
+	}
 	if(file_size==NOT_EXISTING){
 		send(client, HTTP_ERR_404, strlen(HTTP_ERR_404), 0);
 		return 0;
 	}
-	else if(file_size==FILE_IS_DIR){
-		strcat(filename, "/index.html");
-	}
-	else if(file_size==FILE_NO_PERM){
+	if(file_size==FILE_NO_PERM){
 		send(client, HTTP_ERR_403, strlen(HTTP_ERR_403), 0);
 		return 0;
 	}
@@ -449,7 +435,6 @@ static int http_service(int client){
 	sprintf(buf, "Content-length: %ld\r\n\r\n", file_size);
 	send(client, buf, strlen(buf), 0);
 
-	/* if not only HEAD */
 	if(strcmp(request, "GET") == 0){
 		while(!feof(f)){
 			len = fread(buf, 1, FILE_CHUNK_SIZE, f);
