@@ -395,6 +395,7 @@ static int http_service(int client){
 	}
 	if(sscanf(buf, "%7s %255s", request, url) < 2){
 		warning("parsing error");
+		fprintf(stderr, " >Request: `%s`\n", buf);
 		return 1;
 	}
 
