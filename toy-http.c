@@ -68,6 +68,7 @@ static void inline help(void);
 
 static ssize_t file_attributes(char *filename);
 static char *get_content_type(char *filename);
+int parse_head_line(const char *src, char *method, char *filepath);
 static ssize_t recv_line(int fd, char *buf, size_t len);
 static int http_service(int client); // connection with client
 
@@ -358,6 +359,17 @@ static ssize_t recv_line(int fd, char *buf, size_t len){
 
 	return i;
 }
+int parse_head_line(const char *src, char *method, char *filepath){
+	if(strlen(src)<5)return 1;
+	while(*src && *src!=' '){
+		*method++ = *src++;
+	}
+	src++;
+	while(*src && *src!=' '){
+		*filepath++ = *src++;
+	}
+	return 0;
+}
 
 static int http_service(int client){
 	char buf[FILE_CHUNK_SIZE]="\0", request[8]="\0", url[256]="\0";
@@ -369,7 +381,7 @@ static int http_service(int client){
 		warning("can not receive request");
 		return 1;
 	}
-	if(sscanf(buf, "%7s %255s", request, url) < 2){
+	if(parse_head_line(buf, request, url)){
 		warning("parsing error");
 		fprintf(stderr, " >Request: `%s`\n", buf);
 		return 1;
