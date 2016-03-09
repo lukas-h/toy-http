@@ -27,10 +27,7 @@ download [here](http://www.lukashimsel.me/projects.html#bin-toy-http)
 
 ## usage
 After the installation, you can use the command `toy-http`.
-#### arguments
-If you call the command without any arguments, it'll run in the actual folder.
-For more advanced usage, you can set as first argument the folder or port. Then the folder and
-as third argument how many connections are possible at once.  
+If you call toy-http without any arguments, it will serve in the actual folder on port 8976. For better customization, you can set as first or second argument the path to serve or the port. You can optionally add a third argument; the maximum of connections at once.  
 ![](http://www.lukashimsel.me/pics/toy-http2.png)
 
 ## dependencies 
