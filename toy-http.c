@@ -359,15 +359,12 @@ static ssize_t recv_line(int fd, char *buf, size_t len){
 
 	return i;
 }
+
 int parse_head_line(const char *src, char *method, char *filepath){
 	if(strlen(src)<5)return 1;
-	while(*src && *src!=' '){
-		*method++ = *src++;
-	}
+	while((*method++ = *src++) && *src!=' ');
 	src++;
-	while(*src && *src!=' '){
-		*filepath++ = *src++;
-	}
+	while((*filepath++ = *src++) && *src!=' ');
 	return 0;
 }
 
