@@ -30,9 +30,8 @@
 main
 toy-http
 service
+test
 
 # Debug files
 *.dSYM/
 
-# Folders
-benchmark/
