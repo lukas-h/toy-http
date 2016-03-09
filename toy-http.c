@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <signal.h>
 
 #include <unistd.h>
@@ -276,9 +275,7 @@ static int parse_args(int argc, char *argv[]){
 
 static int is_numeric(char *str){
 	do{
-		if( !(*str>='0' && *str<='9') ){
-			return 0;
-		}
+		if( !(*str>='0' && *str<='9') ){ return 0; }
 		str++;
 	} while(*str);
 
@@ -305,7 +302,7 @@ static inline void version(){
 static ssize_t file_attributes(char *filename){
 	struct stat info;
 
-	if(strncmp(filename, "..", 2)==0 || filename[0]=='/'){
+	if(strstr(filename, "..")!=NULL || filename[0]=='/'){
 		return FILE_NO_PERM;
 	}
 	if(stat(filename, &info)==-1){
@@ -380,7 +377,7 @@ static int http_service(int client){
 	}
 	if(parse_head_line(buf, request, url)){
 		warning("parsing error");
-		fprintf(stderr, " >Request: `%s`\n", buf);
+		fprintf(stderr, " >request: `%s`\n", buf);
 		return 1;
 	}
 
@@ -391,7 +388,7 @@ static int http_service(int client){
 		send(client, HTTP_ERR_501, strlen(HTTP_ERR_501), 0);
 
 		warning("request method not supported");
-		printf(" >method: %s\n", request);
+		printf(" >method: `%s`\n", request);
 		return 0;
 	}
 
