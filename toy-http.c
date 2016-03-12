@@ -32,12 +32,12 @@
 
 /* --- defaults & definitions --- */
 #define DEFAULT_FILE	"index.html"
-#define HTTP_PORT		8976
+#define HTTP_PORT	8976
 #define MAX_CONNECTIONS	1024
 #define SERVE_DIRECTORY	"."
 #define FILE_CHUNK_SIZE	4096U
 
-/* --- HTTP error messages --- */
+/* --- HTTP messages --- */
 const char *HTTP_ERR_501 = "HTTP/1.0 501 Not Implemented\r\nContent-Type: text/html\r\nContent-length: 104\r\n\r\n"
 	"<html><head><title>Error</title></head><body><hr><h1>HTTP method not implemented.</h1><hr><p>toy-http</p></body></html>";
 
@@ -58,6 +58,8 @@ struct key_val_t{
 	{ ".js"  ,  "Content-type: text/javascript\r\n"	},
 	{ ".json",  "Content-type: application/json\r\n"},
 	{ ".pdf" ,  "Content-type: application/pdf\r\n"	},
+	{ ".png" ,  "Content-type: image/png\r\n"	},
+	{ ".jpg" ,  "Content-type: image/jpeg\r\n"	},
 };
 
 static int parse_args(int argc, char *argv[]);
@@ -69,7 +71,7 @@ static ssize_t file_attributes(char *filename);
 static char *get_content_type(char *filename);
 int parse_head_line(const char *src, char *method, char *filepath);
 static ssize_t recv_line(int fd, char *buf, size_t len);
-static int http_service(int client); // connection with client
+static int serve(int client); // connection with client
 
 /* --- globals --- */
 static int http_port = HTTP_PORT;
@@ -209,7 +211,7 @@ int main(int argc, char *argv[]){
 		}
 		if(pid==0){
 			close(fd);
-			http_service(client);
+			serve(client);
 
 			shutdown(client, SHUT_RDWR);
 			close(client);
@@ -365,7 +367,7 @@ int parse_head_line(const char *src, char *method, char *filepath){
 	return 0;
 }
 
-static int http_service(int client){
+static int serve(int client){
 	char buf[FILE_CHUNK_SIZE]="\0", request[8]="\0", url[256]="\0";
 	char *filename, *content_type;
 	ssize_t len, file_size;
@@ -430,7 +432,7 @@ static int http_service(int client){
 		send(client, content_type, strlen(content_type), 0);
 	}
 
-	sprintf(buf, "Content-length: %ld\r\n\r\n", file_size);
+	sprintf(buf, "Content-length: %ld\r\nServer: toy-http\r\n\r\n", file_size);
 	send(client, buf, strlen(buf), 0);
 
 	if(strcmp(request, "GET") == 0){
