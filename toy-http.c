@@ -267,7 +267,7 @@ static inline void help(){
 	printf(
 		"Usage: \033[1;31mtoy-http\033[0m [PORT] [SERVE-FOLDER] [MAX-CONNECTIONS]\n"
 		"You can also use it without any arguments,\n to run it in the actual folder.\n\n"
-		"See the project page: `http://himsel.me/toy-http\n"
+		"See the project page: `http://himsel.me/toy-http'\n"
 		"Copyright (C) 2015, 2016 Lukas Himsel\n"
 	    "  This program comes with ABSOLUTELY NO WARRANTY.\n"
 	    "  This is free software, and you are welcome to redistribute it\n"
