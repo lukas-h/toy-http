@@ -32,12 +32,12 @@
 
 /* --- defaults & definitions --- */
 #define DEFAULT_FILE	"index.html"
-#define HTTP_PORT		8976
+#define HTTP_PORT	8976
 #define MAX_CONNECTIONS	1024
 #define SERVE_DIRECTORY	"."
 #define FILE_CHUNK_SIZE	4096U
 
-/* --- HTTP error messages --- */
+/* --- HTTP messages --- */
 const char *HTTP_ERR_501 = "HTTP/1.0 501 Not Implemented\r\nContent-Type: text/html\r\nContent-length: 104\r\n\r\n"
 	"<html><head><title>Error</title></head><body><hr><h1>HTTP method not implemented.</h1><hr><p>toy-http</p></body></html>";
 
@@ -58,6 +58,8 @@ struct key_val_t{
 	{ ".js"  ,  "Content-type: text/javascript\r\n"	},
 	{ ".json",  "Content-type: application/json\r\n"},
 	{ ".pdf" ,  "Content-type: application/pdf\r\n"	},
+	{ ".png" ,  "Content-type: image/png\r\n"	},
+	{ ".jpg" ,  "Content-type: image/jpeg\r\n"	},
 };
 
 static int parse_args(int argc, char *argv[]);
@@ -69,7 +71,7 @@ static ssize_t file_attributes(char *filename);
 static char *get_content_type(char *filename);
 int parse_head_line(const char *src, char *method, char *filepath);
 static ssize_t recv_line(int fd, char *buf, size_t len);
-static int http_service(int client); // connection with client
+static int serve(int client); // connection with client
 
 /* --- globals --- */
 static int http_port = HTTP_PORT;
@@ -126,7 +128,7 @@ static void abort_program(int signum){
 int main(int argc, char *argv[]){
 	char *serve_directory = ".";
 
-	int fd, client, pid, err_cnt;
+	int fd, client, pid;
 	struct sockaddr_in addr, client_addr;
 	socklen_t siz;
 
@@ -188,28 +190,17 @@ int main(int argc, char *argv[]){
 		
 		if(client==-1){
 			error("accept() failed");
-			err_cnt++;
-			if(err_cnt > 2){
-				abort_program(-1);
-			}
 			continue;
-		} else{
-			err_cnt=0;
 		}
 
 		pid = fork();
 		if(pid==-1){
 			error("fork() failed");
-			err_cnt++;
-			if(err_cnt > 2){
-				close(client);
-				abort_program(-1);
-			}
 			continue;
 		}
 		if(pid==0){
 			close(fd);
-			http_service(client);
+			serve(client);
 
 			shutdown(client, SHUT_RDWR);
 			close(client);
@@ -226,48 +217,38 @@ int main(int argc, char *argv[]){
 /* --- argument parser & help display --- */
 static int parse_args(int argc, char *argv[]){
 	size_t num_count, path_count, i;
-	if(argc==1){
+	if(!(argc > 0)){
 		return 1;
 	}
-	else if(argc > 0){
-		for(i=1, num_count=0, path_count=0; i < argc && i < 5; i++){
-			if(strcmp(argv[i], "--help")==0 || strcmp(argv[i], "-h")==0){
-				help();
-				return 0;
-			}
-			else if(strcmp(argv[i], "--version")==0 || strcmp(argv[i], "-v")==0){
-				version();
-				return 0;
-			}
-			else if(is_numeric(argv[i])){
-				switch(num_count){
-					case 0:
-						http_port = atoi(argv[i]);
-					break;
-					case 1:
-						max_connections = atoi(argv[i]);
-					break;
-					default:
-						help();
-						return 0;
-					break;
-				}
-				num_count++;
-			}
-			else{
-				if(path_count > 0){
+	for(i=1, num_count=0, path_count=0; i < argc && i < 5; i++){
+		if(strcmp(argv[i], "--help")==0 || strcmp(argv[i], "-h")==0){
+			help();
+			return 0;
+		}
+		else if(is_numeric(argv[i])){
+			switch(num_count){
+				case 0:
+					http_port = atoi(argv[i]);
+				break;
+				case 1:
+					max_connections = atoi(argv[i]);
+				break;
+				default:
 					help();
 					return 0;
-				} else{
-					serve_dir = i;
-				}
-				path_count++;
+				break;
 			}
+			num_count++;
 		}
-	}
-	else{
-		help();
-		return 0;
+		else{
+			if(path_count > 0){
+				help();
+				return 0;
+			} else{
+				serve_dir = i;
+			}
+			path_count++;
+		}
 	}
 
 	return 1;
@@ -283,14 +264,15 @@ static int is_numeric(char *str){
 }
 
 static inline void help(){
-	puts("Usage: \033[1;34mtoy-http\033[0m <PORT> <SERVE-FOLDER> <MAX-CONNECTIONS>\n"
-	"You can also use it without any arguments,\n to run it in the actual folder.");
-}
-
-static inline void version(){
-	puts("Version: 0.0\nCopyright (C) 2015, 2016 Lukas Himsel\nlicensed under GNU AGPL v3\n"
-	    "This program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\n"
-	    "under certain conditions; see `www.gnu.org/licenses/gpl.html\' for details.\n");
+	printf(
+		"Usage: \033[1;31mtoy-http\033[0m [PORT] [SERVE-FOLDER] [MAX-CONNECTIONS]\n"
+		"You can also use it without any arguments,\n to run it in the actual folder.\n\n"
+		"See the project page: `http://himsel.me/toy-http'\n"
+		"Copyright (C) 2015, 2016 Lukas Himsel\n"
+	    "  This program comes with ABSOLUTELY NO WARRANTY.\n"
+	    "  This is free software, and you are welcome to redistribute it\n"
+	    "  under certain conditions; see `www.gnu.org/licenses/agpl.html\' for details.\n"
+	);
 }
 
 
@@ -349,7 +331,7 @@ static ssize_t recv_line(int fd, char *buf, size_t len){
 		if(buf[i]=='\n'){ break; }
 		else{ i++; }
 	}
-	if((i > 0) && (buf[i-1]=='\r')){
+	if(i && (buf[i-1]=='\r')){
 		i--;
 	}
 	buf[i] = '\0';
@@ -365,7 +347,7 @@ int parse_head_line(const char *src, char *method, char *filepath){
 	return 0;
 }
 
-static int http_service(int client){
+static int serve(int client){
 	char buf[FILE_CHUNK_SIZE]="\0", request[8]="\0", url[256]="\0";
 	char *filename, *content_type;
 	ssize_t len, file_size;
@@ -430,7 +412,7 @@ static int http_service(int client){
 		send(client, content_type, strlen(content_type), 0);
 	}
 
-	sprintf(buf, "Content-length: %ld\r\n\r\n", file_size);
+	sprintf(buf, "Content-length: %ld\r\nServer: toy-http\r\n\r\n", file_size);
 	send(client, buf, strlen(buf), 0);
 
 	if(strcmp(request, "GET") == 0){
