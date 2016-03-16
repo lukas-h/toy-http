@@ -132,7 +132,7 @@ int main(int argc, char *argv[]){
 	struct sockaddr_in addr, client_addr;
 	socklen_t siz;
 
-	if(!parse_args(argc, argv)){
+	if(parse_args(argc, argv)){
 		return 1;
 	}
 
@@ -223,7 +223,7 @@ static int parse_args(int argc, char *argv[]){
 	for(i=1, num_count=0, path_count=0; i < argc && i < 5; i++){
 		if(strcmp(argv[i], "--help")==0 || strcmp(argv[i], "-h")==0){
 			help();
-			return 0;
+			return 1;
 		}
 		else if(is_numeric(argv[i])){
 			switch(num_count){
@@ -235,7 +235,7 @@ static int parse_args(int argc, char *argv[]){
 				break;
 				default:
 					help();
-					return 0;
+					return 1;
 				break;
 			}
 			num_count++;
@@ -243,7 +243,7 @@ static int parse_args(int argc, char *argv[]){
 		else{
 			if(path_count > 0){
 				help();
-				return 0;
+				return 1;
 			} else{
 				serve_dir = i;
 			}
@@ -251,7 +251,7 @@ static int parse_args(int argc, char *argv[]){
 		}
 	}
 
-	return 1;
+	return 0;
 }
 
 static int is_numeric(char *str){
