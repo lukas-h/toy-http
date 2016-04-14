@@ -60,6 +60,8 @@ struct key_val_t{
 	{ ".pdf" ,  "Content-type: application/pdf\r\n"	},
 	{ ".png" ,  "Content-type: image/png\r\n"	},
 	{ ".jpg" ,  "Content-type: image/jpeg\r\n"	},
+	{ ".svg" ,  "Content-type: image/svg+xml\r\n"   },
+	{ ".gif" ,  "Content-type: image/gif\r\n"	}
 };
 
 static int parse_args(int argc, char *argv[]);
