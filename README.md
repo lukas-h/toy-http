@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/lukas-h/toy-http.svg?branch=master)](https://travis-ci.org/lukas-h/toy-http)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)  
 Example http server, providing static file hosting.  
+See the [project page (himsel.me/toy-http)](http://www.lukashimsel.me/toy-http/)
 ## features
 - support for GET and HEAD requests (you can implement other methods easily)  
 - stable error and interruption management   
