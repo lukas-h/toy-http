@@ -52,16 +52,16 @@ struct key_val_t{
 	char *key;
 	char *val;
 } const array[] ={
-	{ ".html",  "Content-type: text/html\r\n"	},
-	{ ".htm" ,  "Content-type: text/html\r\n"	},
-	{ ".css" ,  "Content-type: text/css\r\n"	},
-	{ ".js"  ,  "Content-type: text/javascript\r\n"	},
-	{ ".json",  "Content-type: application/json\r\n"},
-	{ ".pdf" ,  "Content-type: application/pdf\r\n"	},
-	{ ".png" ,  "Content-type: image/png\r\n"	},
-	{ ".jpg" ,  "Content-type: image/jpeg\r\n"	},
-	{ ".svg" ,  "Content-type: image/svg+xml\r\n"   },
-	{ ".gif" ,  "Content-type: image/gif\r\n"	}
+	{ ".html",  "text/html"			},
+	{ ".htm" ,  "text/html"			},
+	{ ".css" ,  "text/css"			},
+	{ ".js"  ,  "text/javascript"	},
+	{ ".json",  "application/json"	},
+	{ ".pdf" ,  "application/pdf"	},
+	{ ".png" ,  "image/png"			},
+	{ ".jpg" ,  "image/jpeg"		},
+	{ ".svg" ,  "image/svg+xml"		},
+	{ ".gif" ,  "image/gif"			}
 };
 
 static int parse_args(int argc, char *argv[]);
