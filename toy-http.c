@@ -278,9 +278,9 @@ static inline void help(){
 
 
 /* --- server procedures and file handling --- */
-#define NOT_EXISTING  0
-#define FILE_IS_DIR  -1
-#define FILE_NO_PERM -2
+#define NOT_EXISTING -1
+#define FILE_IS_DIR  -2
+#define FILE_NO_PERM -3
 
 static ssize_t file_attributes(char *filename){
 	struct stat info;
@@ -296,9 +296,6 @@ static ssize_t file_attributes(char *filename){
 	}
 	if(S_ISDIR(info.st_mode)){
 		return FILE_IS_DIR;
-	}
-	if(!info.st_size){
-		return 0;
 	}
 
 	return info.st_size;
