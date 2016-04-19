@@ -66,7 +66,6 @@ struct key_val_t{
 
 static int parse_args(int argc, char *argv[]);
 static int is_numeric(char *str);
-static void inline version(void);
 static void inline help(void);
 
 static ssize_t file_attributes(char *filename);
@@ -81,9 +80,9 @@ static int max_connections = MAX_CONNECTIONS;
 static int serve_dir = 0;
 
 /* --- error and signal handling --- */
-#define error(msg)		fprintf(stderr, "\033[1;41merror:\033[0m %s\n", (msg))
-#define warning(msg)	fprintf(stderr, "\033[1;43mwarning:\033[0m %s\n", (msg))
-#define info(msg)		fprintf(stdout, "\033[1;44minfo:\033[0m %s\n", (msg))
+#define error(msg, ...)		fprintf(stderr, "\033[1;41merror:\033[0m" msg, ##__VA_ARGS__)
+#define warning(msg, ...)	fprintf(stderr, "\033[1;43mwarning:\033[0m" msg, ##__VA_ARGS__)
+#define info(msg, ...)		fprintf(stdout, "\033[1;44minfo:\033[0m" msg, ##__VA_ARGS__)
 
 #define SET_FD 1
 #define CLOSE_FD 2
@@ -148,7 +147,7 @@ int main(int argc, char *argv[]){
 	signal(SIGCHLD, SIG_IGN);
 
 	if(http_port >  65535){
-		error("illegal port");
+		error("illegal port\n");
 		abort_program(-1);
 	}
 
@@ -158,7 +157,7 @@ int main(int argc, char *argv[]){
 
 	fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if(fd == -1){
-		error("can not create new socket");
+		error("can not create new socket\n");
 		abort_program(-1);
 	}
 
@@ -167,23 +166,23 @@ int main(int argc, char *argv[]){
 	addr.sin_addr.s_addr = INADDR_ANY;
 
 	if(bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in))==-1){
-		error("bind() failed.");
-		printf(" >Is another server running on this port?\n");
+		error("bind() failed.\n >Is another server running on this port?\n");
 		abort_program(-1);
 	}
 
 	if(listen(fd, max_connections)==-1){
-		error("listen() failed");
+		error("listen() failed\n");
 		abort_program(-1);
 	}
 
 	if(chdir(serve_directory)){
-		error("invalid path or can not set");
+		error("invalid path or can not set\n");
 		abort_program(-1);
 	}
 
-	info("Server running!");
-	printf(" >host: http://127.0.0.1:%d\n >\033[1mCtrl-C\033[0m to abort.\n", http_port);
+	info("Server running!\n"
+	" >host: http://127.0.0.1:%d\n"
+	" >\033[1mCtrl-C\033[0m to abort.\n", http_port);
 	handle_fd(fd, SET_FD);
 
 	while(1){
@@ -191,13 +190,13 @@ int main(int argc, char *argv[]){
 		client = accept(fd, (struct sockaddr *)&client_addr, &siz);
 		
 		if(client==-1){
-			error("accept() failed");
+			error("accept() failed\n");
 			continue;
 		}
 
 		pid = fork();
 		if(pid==-1){
-			error("fork() failed");
+			error("fork() failed\n");
 			continue;
 		}
 		if(pid==0){
@@ -344,7 +343,8 @@ static ssize_t recv_line(int fd, char *buf, size_t len){
 int parse_head_line(const char *src, char *method, char *filepath){
 	if(strlen(src)<5)return 1;
 	while((*method++ = *src++) && *src!=' ');
-	src++;
+
+	src++; /* whitespace */
 	while((*filepath++ = *src++) && *src!=' ');
 	return 0;
 }
@@ -356,12 +356,11 @@ static int serve(int client){
 	FILE *f;
 
 	if(recv_line(client, buf, (sizeof(buf)-1) )<=3){
-		warning("can not receive request");
+		warning("can not receive request\n");
 		return 1;
 	}
 	if(parse_head_line(buf, request, url)){
-		warning("parsing error");
-		fprintf(stderr, " >request: `%s`\n", buf);
+		warning("parsing error\n >request: `%s`\n", buf);
 		return 1;
 	}
 
@@ -371,8 +370,7 @@ static int serve(int client){
 
 		send(client, HTTP_ERR_501, strlen(HTTP_ERR_501), 0);
 
-		warning("request method not supported");
-		printf(" >method: `%s`\n", request);
+		warning("request method not supported\n >method: `%s`\n", request);
 		return 0;
 	}
 
@@ -411,7 +409,10 @@ static int serve(int client){
 	/* add content information */
 	content_type = get_content_type(filename);
 	if(content_type!=NULL){
+		sprintf(buf, "Content-type: %s\r\n", content_type);
 		send(client, content_type, strlen(content_type), 0);
+	} else{
+		warning("No match for file extension `%s`.\n >Sending response without Content-type", filename);
 	}
 
 	sprintf(buf, "Content-length: %ld\r\nServer: toy-http\r\n\r\n", file_size);
