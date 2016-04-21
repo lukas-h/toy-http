@@ -407,7 +407,7 @@ static int serve(int client){
 	content_type = get_content_type(filename);
 	if(content_type!=NULL){
 		sprintf(buf, "Content-type: %s\r\n", content_type);
-		send(client, content_type, strlen(content_type), 0);
+		send(client, buf, strlen(buf), 0);
 	} else{
 		warning("No match for file extension `%s`.\n >Sending response without Content-type", filename);
 	}
