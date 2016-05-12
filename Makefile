@@ -1,7 +1,7 @@
 # created by Lukas Himsel, 2016
 toy-http: toy-http.o
-	gcc -O2 -c toy-http.c
-	gcc -O2 -o toy-http toy-http.o
+	cc -O2 -c toy-http.c
+	cc -O2 -o toy-http toy-http.o
 
 clean:
 	rm *.o
