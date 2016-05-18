@@ -72,7 +72,7 @@ static ssize_t file_attributes(char *filename);
 static char *get_content_type(char *filename);
 int parse_head_line(const char *src, char *method, char *filepath);
 static ssize_t recv_line(int fd, char *buf, size_t len);
-static int serve(int client); // connection with client
+static int serve(int client);
 
 /* --- globals --- */
 static int http_port = HTTP_PORT;
@@ -103,22 +103,16 @@ static void abort_program(int signum){
 	switch(signum){
 		case SIGABRT: case SIGHUP:
 			error("abnormal termination: exit");
-			_exit(1);
 		break;
 		case SIGILL: case SIGSEGV:
 			error("invalid instruction: please contact the maintainer");
-			_exit(1);
 		break;
 		case SIGINT:
 			info("exit");
-			_exit(0);
 		break;
 		case SIGTERM: case SIGKILL:
 			info("termination request: exit");
-			_exit(0);
-		break;
-		default:
-			_exit(1);
+			signum = 0;
 		break;
 	}
 
@@ -146,7 +140,7 @@ int main(int argc, char *argv[]){
 	signal(SIGTERM, abort_program);
 	signal(SIGCHLD, SIG_IGN);
 
-	if(http_port >  65535){
+	if(http_port > 65535){
 		error("illegal port\n");
 		abort_program(-1);
 	}
@@ -188,7 +182,7 @@ int main(int argc, char *argv[]){
 	while(1){
 		siz = sizeof(struct sockaddr_in);
 		client = accept(fd, (struct sockaddr *)&client_addr, &siz);
-		
+
 		if(client==-1){
 			error("accept() failed\n");
 			continue;
@@ -276,7 +270,6 @@ static inline void help(){
 	);
 }
 
-
 /* --- server procedures and file handling --- */
 #define NOT_EXISTING -1
 #define FILE_IS_DIR  -2
@@ -285,18 +278,10 @@ static inline void help(){
 static ssize_t file_attributes(char *filename){
 	struct stat info;
 
-	if(strstr(filename, "..")!=NULL || filename[0]=='/'){
-		return FILE_NO_PERM;
-	}
-	if(stat(filename, &info)==-1){
-		return NOT_EXISTING;
-	}
-	if(!(info.st_mode & S_IRUSR)){
-		return FILE_NO_PERM;
-	}
-	if(S_ISDIR(info.st_mode)){
-		return FILE_IS_DIR;
-	}
+	if(strstr(filename, "..")!=NULL || filename[0]=='/'){ return FILE_NO_PERM; }
+	if(stat(filename, &info)==-1){ return NOT_EXISTING; }
+	if(!(info.st_mode & S_IRUSR)){ return FILE_NO_PERM; }
+	if(S_ISDIR(info.st_mode)){ return FILE_IS_DIR; }
 
 	return info.st_size;
 }
@@ -329,9 +314,7 @@ static ssize_t recv_line(int fd, char *buf, size_t len){
 		if(buf[i]=='\n'){ break; }
 		else{ i++; }
 	}
-	if(i && (buf[i-1]=='\r')){
-		i--;
-	}
+	if(i && (buf[i-1]=='\r')){ i--; }
 	buf[i] = '\0';
 
 	return i;
@@ -376,12 +359,10 @@ static int serve(int client){
 	}
 
 	filename = &(url[1]);
-	if(!strlen(filename)){
-		filename = DEFAULT_FILE;
-	}
+	if(!strlen(filename)){ filename = DEFAULT_FILE;	}
 
 	file_size = file_attributes(filename);
-	
+
 	if(file_size==FILE_IS_DIR){
 		strcat(filename, "/index.html");
 		file_size = file_attributes(filename);
@@ -418,9 +399,8 @@ static int serve(int client){
 	if(strcmp(request, "GET") == 0){
 		while(!feof(f)){
 			len = fread(buf, 1, FILE_CHUNK_SIZE, f);
-			if(len){
-				send(client, buf, len, 0);
-			}
+
+			if(len){ send(client, buf, len, 0); }
 		}
 	}
 	fclose(f);
