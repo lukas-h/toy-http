@@ -64,20 +64,20 @@ struct key_val_t{
 	{ ".gif" ,  "image/gif"			}
 };
 
-static int parse_args(int argc, char *argv[]);
-static int is_numeric(char *str);
-static void inline help(void);
+int parse_args(int argc, char *argv[]);
+int is_numeric(char *str);
+void inline help(void);
 
-static ssize_t file_attributes(char *filename);
-static char *get_content_type(char *filename);
+ssize_t file_attributes(char *filename);
+char *get_content_type(char *filename);
 int parse_head_line(const char *src, char *method, char *filepath);
-static ssize_t recv_line(int fd, char *buf, size_t len);
-static int serve(int client);
+ssize_t recv_line(int fd, char *buf, size_t len);
+int serve(int client);
 
 /* --- globals --- */
-static int http_port = HTTP_PORT;
-static int max_connections = MAX_CONNECTIONS;
-static int serve_dir = 0;
+int http_port = HTTP_PORT;
+int max_connections = MAX_CONNECTIONS;
+int serve_dir = 0;
 
 /* --- error and signal handling --- */
 #define error(msg, ...)		fprintf(stderr, "\033[1;41merror:\033[0m" msg, ##__VA_ARGS__)
@@ -210,7 +210,7 @@ int main(int argc, char *argv[]){
 }
 
 /* --- argument parser & help display --- */
-static int parse_args(int argc, char *argv[]){
+int parse_args(int argc, char *argv[]){
 	size_t num_count, path_count, i;
 	if(!(argc > 0)){
 		return 1;
@@ -249,7 +249,7 @@ static int parse_args(int argc, char *argv[]){
 	return 0;
 }
 
-static int is_numeric(char *str){
+int is_numeric(char *str){
 	do{
 		if( !(*str>='0' && *str<='9') ){ return 0; }
 		str++;
@@ -258,7 +258,7 @@ static int is_numeric(char *str){
 	return 1;
 }
 
-static inline void help(){
+inline void help(){
 	printf(
 		"Usage: \033[1;31mtoy-http\033[0m [PORT] [SERVE-FOLDER] [MAX-CONNECTIONS]\n"
 		"You can also use it without any arguments,\n to run it in the actual folder.\n\n"
@@ -275,7 +275,7 @@ static inline void help(){
 #define FILE_IS_DIR  -2
 #define FILE_NO_PERM -3
 
-static ssize_t file_attributes(char *filename){
+ssize_t file_attributes(char *filename){
 	struct stat info;
 
 	if(strstr(filename, "..")!=NULL || filename[0]=='/'){ return FILE_NO_PERM; }
@@ -286,7 +286,7 @@ static ssize_t file_attributes(char *filename){
 	return info.st_size;
 }
 
-static char *get_content_type(char *filename){
+char *get_content_type(char *filename){
 	size_t index, len_name, len_key;
 	len_name = strlen(filename);
 	char *p;
@@ -306,7 +306,7 @@ static char *get_content_type(char *filename){
 	return NULL;
 }
 
-static ssize_t recv_line(int fd, char *buf, size_t len){
+ssize_t recv_line(int fd, char *buf, size_t len){
 	size_t i=0;
 	ssize_t err=1;
 	while((i < len-1) && err==1){
@@ -329,7 +329,7 @@ int parse_head_line(const char *src, char *method, char *filepath){
 	return 0;
 }
 
-static int serve(int client){
+int serve(int client){
 	char buf[FILE_CHUNK_SIZE]="\0", request[8]="\0", url[256]="\0";
 	char *filename, *content_type;
 	ssize_t len, file_size;
@@ -399,7 +399,6 @@ static int serve(int client){
 	if(strcmp(request, "GET") == 0){
 		while(!feof(f)){
 			len = fread(buf, 1, FILE_CHUNK_SIZE, f);
-
 			if(len){ send(client, buf, len, 0); }
 		}
 	}
