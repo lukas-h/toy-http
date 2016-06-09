@@ -1,6 +1,7 @@
 ![](http://www.lukashimsel.me/pics/toy-http.png)
 # toy-http
 [![Build Status](https://travis-ci.org/lukas-h/toy-http.svg?branch=master)](https://travis-ci.org/lukas-h/toy-http)
+[![Coverage Status](https://coveralls.io/repos/github/lukas-h/toy-http/badge.svg?branch=master)](https://coveralls.io/github/lukas-h/toy-http?branch=master)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)  
 Example http server, providing static file hosting.  
 See the [project page (himsel.me/toy-http)](http://www.lukashimsel.me/toy-http/)
