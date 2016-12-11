@@ -1,8 +1,6 @@
 language: c
-sudo :false
-compiler: gcc
-before_install:
-  - pip install --user cpp-coveralls
+sudo: false
+compiler:
+  - clang
+  - gcc
 script: make
-after_success:
-  - coveralls --gcov-options '\-lp'
